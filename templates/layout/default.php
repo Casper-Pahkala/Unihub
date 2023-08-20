@@ -52,7 +52,8 @@
             align-items: center;
             justify-content: center;
             border-radius: 100px;
-            background: rgb(111, 115, 165);
+            /* background: rgb(111, 115, 165); */
+            background-color: rgb(29, 26, 37);
             cursor: pointer;
         }
 
@@ -71,8 +72,8 @@
 
         .nav-seperator {
             width: 0.2px;
-        height: 24px;
-        background: #999999;
+            height: 24px;
+            background: #999999;
         }
 
         .material-symbols-rounded {
@@ -114,9 +115,9 @@
         </div>
 
         <div id="profile-button">
-        <span class="material-symbols-rounded" style="font-size: 28px;">
+        <!-- <span class="material-symbols-rounded" style="font-size: 28px;">
             person
-        </span>
+        </span> -->
         </div>
     </nav>
     <main class="main">

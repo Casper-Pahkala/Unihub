@@ -103,7 +103,7 @@ return [
         'menus' => [
             'className' => FileEngine::class,
             'path' => CACHE . 'menus' . DS,
-            'duration' => '+1 years',
+            'duration' => '+1 week',
             'url' => env('CACHE_DEFAULT_URL', null),
         ],
 

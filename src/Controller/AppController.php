@@ -58,12 +58,14 @@ class AppController extends Controller
         // Bacchus
         $cachedMenu = Cache::read('bacchus-' . FrozenTime::now()->format('Y-m-d'), 'menus');
         if ($cachedMenu) {
-            $menus[] = [
-                'name' => 'Bacchus',
-                'menu' => $cachedMenu,
-                'image' => '/img/bacchus.jpg',
-                'link' => 'https://bacchus.fi/lounas-brunssi/'
-            ];
+            if ($cachedMenu != 'closed') {
+                $menus[] = [
+                    'name' => 'Bacchus',
+                    'menu' => $cachedMenu,
+                    'image' => '/img/bacchus.jpg',
+                    'link' => 'https://bacchus.fi/lounas-brunssi/'
+                ];
+            }
         } else {
             $bacchusMenu = $this->getBacchusMenu();
             if ($bacchusMenu) {
@@ -74,18 +76,22 @@ class AppController extends Controller
                     'image' => '/img/bacchus.jpg',
                     'link' => 'https://bacchus.fi/lounas-brunssi/'
                 ];
+            } else {
+                Cache::write('bacchus-' . FrozenTime::now()->format('Y-m-d'), 'closed', 'menus');
             }
         }
 
         // Åbo
         $cachedMenu = Cache::read('åbo-' . FrozenTime::now()->format('Y-m-d'), 'menus');
         if ($cachedMenu) {
-            $menus[] = [
-                'name' => 'Åbo Akademi',
-                'menu' => $cachedMenu,
-                'image' => '/img/åbo.png',
-                'link' => 'https://abo-academi.ravintolapalvelut.iss.fi/abo-academi/lounaslista'
-            ];
+            if ($cachedMenu != 'closed') {
+                $menus[] = [
+                    'name' => 'Åbo Akademi',
+                    'menu' => $cachedMenu,
+                    'image' => '/img/åbo.png',
+                    'link' => 'https://abo-academi.ravintolapalvelut.iss.fi/abo-academi/lounaslista'
+                ];
+            }
         } else {
             $menu = $this->getÅboMenu();
             if ($menu) {
@@ -96,6 +102,8 @@ class AppController extends Controller
                     'image' => '/img/åbo.png',
                     'link' => 'https://abo-academi.ravintolapalvelut.iss.fi/abo-academi/lounaslista'
                 ];
+            } else {
+                Cache::write('åbo-' . FrozenTime::now()->format('Y-m-d'), 'closed', 'menus');
             }
         }
         $this->set(compact('menus'));
