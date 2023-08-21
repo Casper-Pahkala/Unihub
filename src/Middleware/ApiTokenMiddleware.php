@@ -15,9 +15,10 @@ class ApiTokenMiddleware
         $controller = $request->getParam('controller');
         $action = $request->getParam('action');
         $whitelist = [
-            'getBacchusMenu'
+            'getBacchusMenu',
+            'commendRestaurant'
         ];
-        if (in_array($action, $whitelist)) {
+        if (in_array($action, $whitelist) || in_array($controller, $whitelist)) {
             return $next($request, $response);
         }
         $token = $request->getHeaderLine('X-Api-Token');

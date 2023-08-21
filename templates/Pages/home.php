@@ -15,14 +15,19 @@
             'src' => '/img/lukkarikone.png',
             'name' => 'Lukkari',
             'link' => 'https://lukkarit.uwasa.fi/#/schedule'
-        ]
-        ,
+        ],
         [
             'src' => '/img/office.jpg',
             'name' => 'Office',
             'link' => 'https://portal.office.com/'
+        ],
+        [
+            'src' => '/img/tritonia.png',
+            'name' => 'Tilavaraus',
+            'link' => 'https://www.tritonia.fi/fi/tilavaraus'
         ]
     ];
+    // dd($topRestaurant);
 ?>
 
 <style>
@@ -32,7 +37,7 @@
         gap: 40px;
         align-items: center;
         justify-content: center;
-
+        flex-wrap: wrap;
     }
 
     .quicklink {
@@ -63,14 +68,55 @@
     #restaurants {
         display: flex;
         margin-top: 100px;
+        margin-bottom: 100px;
         gap: 30px;
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
     .restaurant {
-        width: 300px;
+        width: 100%;
         border-radius: 10px;
         background-color: #232431;
         overflow: hidden;
+    }
+
+    .restaurant-container {
+        background-color: #232431;
+        position: relative;
+        width: 330px;
+        border-radius: 10px;
+    }
+
+    .restaurant-like-btn {
+        position: absolute;
+        right: -5px;
+        bottom: -5px;
+        width: 44px;
+        height: 44px;
+        border-radius: 100px;
+        background: linear-gradient(to right, rgb(74, 105, 205), rgb(127, 80, 234));
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 9px;
+        transform: scale(1);
+        transition: transform 0.4s ease;
+        outline: none;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    .restaurant-commend-container {
+        position: absolute;
+        top: -20px;
+        left: -20px;
+        height: 64px;
+        width: 64px;
+        background-color: #232431;
+        border-radius: 100px;
+        padding: 5px;
+        padding-right: 7.4px;
     }
 
     .restaurant-img {
@@ -83,12 +129,30 @@
         border-bottom: 1px #494a5b solid;
     }
     .menu-item {
-        padding: 5px 0;
+        padding: 10px 0;
     }
 
     .restaurant-menu {
-        color: #d7d7d7;
+        color: #e9e9e9;
         padding: 0 8px;
+    }
+
+    @media (max-width: 1199px) {
+        .main {
+            padding-top: 50px;
+        }
+    }
+
+    @keyframes hideAnim {
+        0% {
+            transform: scale(1);
+        }
+        20% {
+            transform: scale(1.15);
+        }
+        100% {
+            transform: scale(0);
+        }
     }
 </style>
 <div id="quicklinks">
@@ -103,13 +167,70 @@
 <div id="restaurants">
 
     <?php foreach($menus as $menu): ?>
-        <div class="restaurant" href="<?= $menu['link'] ?>" target="_blank">
-            <img class="restaurant-img" src="<?= $menu['image'] ?>" alt="<?= $menu['name'] ?> image">
-            <div class="restaurant-menu">
-            <?php foreach($menu['menu'] as $menuItem): ?>
-                <div class="menu-item"><?= $menuItem ?></div>
-            <?php endforeach; ?>
+        <div class="restaurant-container">
+            <div class="restaurant" href="<?= $menu['link'] ?>" target="_blank">
+                <img class="restaurant-img" src="<?= $menu['image'] ?>" alt="<?= $menu['name'] ?> image">
+                <div class="restaurant-menu">
+                    <?php foreach($menu['menu'] as $menuItem): ?>
+                        <div class="menu-item"><?= $menuItem ?></div>
+                    <?php endforeach; ?>
+                </div>
             </div>
-    </div>
+            
+            <?php if($topRestaurant && $topRestaurant == $menu['id']): ?>
+                <div class="restaurant-commend-container">
+                    <img src="/img/flame-animation.gif" style="object-fit: container;">
+                </div>
+            <?php endif; ?>
+
+            <?php if ($canCommend): ?>
+                <div class="restaurant-like-btn" data-id="<?= $menu['id'] ?>">
+                    <img src="/img/thumbs-up.png" style="object-fit: container;">
+                </div>
+            <?php endif; ?>
+        </div>
     <?php endforeach; ?>
 </div>
+
+<script defer>
+    $('.restaurant-like-btn').click(function () {
+        let id = $(this).attr('data-id');
+        $(this).find('img').attr('src', '/img/thumbs-up-animated.gif');
+        let self = this;
+        $('.restaurant-like-btn').each(function() {
+            if (this != self) {
+                $(this).css('animation', 'hideAnim 0.5s forwards');
+                setTimeout(() => {
+                    remove($(this));
+                }, 500);
+            }
+        })
+        setTimeout(() => {
+            $(this).find('img').attr('src', '/img/thumbs-up.png');
+        }, 1200);
+        setTimeout(() => {
+            $(this).css('animation', 'hideAnim 0.5s forwards');
+            setTimeout(() => {
+                remove($(this));
+            }, 700);
+        }, 600);
+
+        const data = {
+            id: parseInt(id),
+        };
+
+        $.ajax({
+            url: '/api/commendRestaurant.json',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            method: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function(data){
+                console.log('succes: '+data);
+            }
+        });
+    })
+</script>

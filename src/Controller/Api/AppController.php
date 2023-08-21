@@ -2,6 +2,7 @@
 namespace App\Controller\Api;
 use Cake\Controller\Controller;
 use Cake\I18n\Time;
+use Cake\I18n\FrozenTime;
 use Cake\Http\Client;
 
 class AppController extends Controller
@@ -47,5 +48,32 @@ class AppController extends Controller
             }
         }
         return $this->response->withType('application/json')->withStringBody(json_encode(['message' => 'Bacchus is not open today']));
+    }
+
+    public function commendRestaurant() {
+        $this->request->allowMethod(['post']);
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+            $ip = $_SERVER['REMOTE_ADDR'];
+            $this->loadModel('RestaurantCommends');
+            $commendModel = $this->RestaurantCommends->newEmptyEntity();
+            $commendModel->ip = $ip;
+            $commendModel->restaurant_id = $data['id'];
+            $commendModel->date = FrozenTime::now()->format('Y-m-d');
+            $message = 'failed';
+            $query = $this->RestaurantCommends->find()
+            ->where([
+                'date' => FrozenTime::now()->format('Y-m-d'),
+                'ip' => $ip
+            ])
+            ->first();
+        
+            $canCommend = empty($query);
+            if ($canCommend && $this->RestaurantCommends->save($commendModel)) {
+                $message = 'success';
+            }
+            return $this->response->withType('application/json')->withStringBody(json_encode(['message' => $message]));
+        }
+        return $this->response->withType('application/json')->withStringBody(json_encode(['message' => 'invalid data']));
     }
 }

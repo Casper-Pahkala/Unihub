@@ -55,37 +55,12 @@ class AppController extends Controller
 
         $menus = [];
 
-        // Bacchus
-        $cachedMenu = Cache::read('bacchus-' . FrozenTime::now()->format('Y-m-d'), 'menus');
-        if ($cachedMenu) {
-            if ($cachedMenu != 'closed') {
-                $menus[] = [
-                    'name' => 'Bacchus',
-                    'menu' => $cachedMenu,
-                    'image' => '/img/bacchus.jpg',
-                    'link' => 'https://bacchus.fi/lounas-brunssi/'
-                ];
-            }
-        } else {
-            $bacchusMenu = $this->getBacchusMenu();
-            if ($bacchusMenu) {
-                Cache::write('bacchus-' . FrozenTime::now()->format('Y-m-d'), $bacchusMenu, 'menus');
-                $menus[] = [
-                    'name' => 'Bacchus',
-                    'menu' => $bacchusMenu,
-                    'image' => '/img/bacchus.jpg',
-                    'link' => 'https://bacchus.fi/lounas-brunssi/'
-                ];
-            } else {
-                Cache::write('bacchus-' . FrozenTime::now()->format('Y-m-d'), 'closed', 'menus');
-            }
-        }
-
         // Åbo
         $cachedMenu = Cache::read('åbo-' . FrozenTime::now()->format('Y-m-d'), 'menus');
         if ($cachedMenu) {
             if ($cachedMenu != 'closed') {
                 $menus[] = [
+                    'id' => 1,
                     'name' => 'Åbo Akademi',
                     'menu' => $cachedMenu,
                     'image' => '/img/åbo.png',
@@ -97,6 +72,7 @@ class AppController extends Controller
             if ($menu) {
                 Cache::write('åbo-' . FrozenTime::now()->format('Y-m-d'), $menu, 'menus');
                 $menus[] = [
+                    'id' => 1,
                     'name' => 'Åbo Akademi',
                     'menu' => $menu,
                     'image' => '/img/åbo.png',
@@ -106,7 +82,96 @@ class AppController extends Controller
                 Cache::write('åbo-' . FrozenTime::now()->format('Y-m-d'), 'closed', 'menus');
             }
         }
-        $this->set(compact('menus'));
+
+        // Åbo
+        $cachedMenu = Cache::read('cotton-' . FrozenTime::now()->format('Y-m-d'), 'menus');
+        if ($cachedMenu) {
+            if ($cachedMenu != 'closed') {
+                $menus[] = [
+                    'id' => 2,
+                    'name' => 'Cotton Club',
+                    'menu' => $cachedMenu,
+                    'image' => '/img/cotton.png',
+                    'link' => 'https://www.cotton-club.fi/ruokalista'
+                ];
+            }
+        } else {
+            $menu = $this->getCottonMenu();
+            if ($menu) {
+                Cache::write('cotton-' . FrozenTime::now()->format('Y-m-d'), $menu, 'menus');
+                $menus[] = [
+                    'id' => 2,
+                    'name' => 'Cotton Club',
+                    'menu' => $menu,
+                    'image' => '/img/cotton.png',
+                    'link' => 'https://www.cotton-club.fi/ruokalista'
+                ];
+            } else {
+                Cache::write('cotton-' . FrozenTime::now()->format('Y-m-d'), 'closed', 'menus');
+            }
+        }
+
+        // Bacchus
+        $cachedMenu = Cache::read('bacchus-' . FrozenTime::now()->format('Y-m-d'), 'menus');
+        if ($cachedMenu) {
+            if ($cachedMenu != 'closed') {
+                $menus[] = [
+                    'id' => 3,
+                    'name' => 'Bacchus',
+                    'menu' => $cachedMenu,
+                    'image' => '/img/bacchus.jpg',
+                    'link' => 'https://bacchus.fi/lounas-brunssi/'
+                ];
+            }
+        } else {
+            $bacchusMenu = $this->getBacchusMenu();
+            if ($bacchusMenu) {
+                Cache::write('bacchus-' . FrozenTime::now()->format('Y-m-d'), $bacchusMenu, 'menus');
+                $menus[] = [
+                    'id' => 3,
+                    'name' => 'Bacchus',
+                    'menu' => $bacchusMenu,
+                    'image' => '/img/bacchus.jpg',
+                    'link' => 'https://bacchus.fi/lounas-brunssi/'
+                ];
+            } else {
+                Cache::write('bacchus-' . FrozenTime::now()->format('Y-m-d'), 'closed', 'menus');
+            }
+        }
+
+        $ip = $_SERVER['REMOTE_ADDR'];
+
+        $this->loadModel('RestaurantCommends');
+
+        $query = $this->RestaurantCommends->find()
+            ->where([
+                'date' => FrozenTime::now()->format('Y-m-d'),
+                'ip' => $ip
+            ])
+            ->first();
+        
+        $canCommend = empty($query);
+
+        $restaurantCommends = $this->RestaurantCommends->find()
+            ->select(['restaurant_id'])
+            ->where(['date' => FrozenTime::now()->setTimezone('Europe/Helsinki')->format('Y-m-d')])
+            ->enableHydration(false)
+            ->toArray();
+
+        $commends = [
+            '1' => 0,
+            '2' => 0,
+            '3' => 0
+        ];
+        foreach ($restaurantCommends as $commend) {
+            $commends[$commend['restaurant_id']] += 1;
+        }
+        arsort($commends);
+        $topRestaurant = reset($commends);
+        usort($menus, function($a, $b) use ($commends) {
+            return $commends[$b['id']] <=> $commends[$a['id']];
+        });
+        $this->set(compact('menus', 'canCommend', 'topRestaurant'));
     }
 
 
@@ -125,17 +190,17 @@ class AppController extends Controller
                 //Time::now()->setTimezone('Europe/Helsinki')->format('N') - 1
                 if (Time::now()->setTimezone('Europe/Helsinki')->format('N') - 1 == $key) {
                     $menu = $div->nodeValue;
-                    $menu = str_replace('p ( M G )', '', $menu);
+                    // $menu = str_replace('p ( M G )', '', $menu);
                     $menu = str_replace("\n", "", $menu);
                     $menu = str_replace(")", ")\n", $menu);
-                    $menu = preg_replace('/\([^)]+\)/', '', $menu);
+                    // $menu = preg_replace('/\([^)]+\)/', '', $menu);
                     $menu = explode('Salaattipöytä – 12,70€', $menu)[1];
                     $menu = explode('Viikon vege', $menu)[0];
                     $menus = explode("\n", $menu);
                     $realMenus = [];
                     foreach ($menus as &$menu) {
                         $menu = trim($menu);
-                        if (!empty($menu)) {
+                        if (!empty($menu) && !str_contains($menu, 'Viikon Vege')) {
                             $menu = preg_replace('/\xc2\xa0/', '', $menu);
                             $realMenus[] = $menu;
                         }
@@ -179,6 +244,46 @@ class AppController extends Controller
                     return $realMenus;
                 }
             }
+        }
+        return false;
+    }
+
+    private function getCottonMenu() {
+        $http = new Client();
+        $response = $http->get('https://www.cotton-club.fi/ruokalista');
+        if ($response->isOk()) {
+            $data = $response;
+            $htmlString = $data->getStringBody();
+            $doc = new \DOMDocument();
+            @$doc->loadHTML($htmlString);
+            $xpath = new \DOMXPath($doc);
+            $priceLists = $xpath->query("//div[contains(@class, 'pricelist')]");
+
+            foreach ($priceLists as $key => $priceList) {
+                if (Time::now()->setTimezone('Europe/Helsinki')->format('N') == $key) {
+                    $itemnameElements = $xpath->query("./*[2]//span[contains(@class, 'itemname')]", $priceList);
+                    $realMenus = [];
+                    foreach ($itemnameElements as $itemnameElement) {
+                        $item = trim($itemnameElement->nodeValue);
+                        // $lg = explode(' (', $item);
+                        $parts  = explode(' / ', $item);
+                        $correctName = trim($parts[0]);
+
+                        // $item = $item . ' (' . $lg;
+                        if (isset($parts[1])) {
+                            $additionalParts = explode("(", $parts[1], 2);
+                            if (isset($additionalParts[1])) {
+                                $additionalInfo = "(" . $additionalParts[1];
+                                $correctName .= " " . trim($additionalInfo);
+                            }
+                        }
+                        $item = trim($correctName);
+                        $realMenus[] = $item;
+                    }
+                    return $realMenus;
+                }
+            }
+
         }
         return false;
     }

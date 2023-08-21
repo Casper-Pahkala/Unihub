@@ -17,11 +17,14 @@
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
+    <?= $this->Html->script('/js/jquery/jquery.js'); ?>
+    <?= $this->Html->meta('csrfToken', $this->request->getAttribute('csrfToken')); ?>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
     <style>
 
         head, body {
             background-color: rgb(29, 26, 37);
+            min-width: 360px;
         }
 
         #logo {
@@ -33,8 +36,8 @@
         }
 
         .top-nav {
-            height: 60px;
-            padding: 5px;
+            height: 80px;
+            padding: 10px;
             position: relative;
         }
 
@@ -61,12 +64,14 @@
             position: relative;
             cursor: pointer;
             color: #c1c3cb;
+            font-weight: 700;
+            font-size: 20px;
         }
 
         .nav-item.selected {
             color: #e9e9e9;
         }
-        .nav-item:hover {
+        .nav-item:hover  {
             color: white;
         }
 
@@ -96,14 +101,17 @@
     </style>
 </head>
 <body>
+    <script>
+        const csrfToken = document.querySelector('meta[name="csrfToken"]').getAttribute('content');
+    </script>
     <nav class="top-nav">
         <a href="/" id="logo-container">
             <img id="logo" src="/img/UniHub-logo.jpg">
         </a>
         <div class="navigation-items">
-            <div class="nav-item selected">
+            <a class="nav-item selected" href="/">
                 Etusivu
-            </div>
+            </a>
             <!-- <div class="nav-seperator"></div>
             <div class="nav-item">
                 Lipun myynti
