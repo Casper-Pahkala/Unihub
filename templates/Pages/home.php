@@ -7,6 +7,11 @@
             'link' => 'https://moodle.uwasa.fi/theme/vy_clean/vy_login/vy_login.php?errorcode=4'
         ],
         [
+            'src' => '/img/vamk.png',
+            'name' => 'Portal',
+            'link' => 'https://portal.vamk.fi/login/index.php'
+        ],
+        [
             'src' => '/img/peppi.png',
             'name' => 'Peppi',
             'link' => 'https://opiskelija.peppi.uwasa.fi/etusivu'
@@ -25,7 +30,7 @@
             'src' => '/img/tritonia.png',
             'name' => 'Tilavaraus',
             'link' => 'https://www.tritonia.fi/fi/tilavaraus'
-        ]
+        ],
     ];
     // dd($topRestaurant);
 ?>
@@ -193,6 +198,21 @@
 </div>
 
 <script defer>
+    var deviceId = null;
+    let today = new Date();
+    var formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    if (localStorage.getItem("deviceId")) {
+        deviceId = localStorage.getItem("deviceId");
+        if (localStorage.getItem(deviceId + '-' + formattedDate)) {
+            $('.restaurant-like-btn').each(function() {
+                $(this).remove();
+            })
+        }
+    } else {
+        deviceId = generateID();
+        localStorage.setItem("deviceId", deviceId);
+    }
+
     $('.restaurant-like-btn').click(function () {
         let id = $(this).attr('data-id');
         $(this).find('img').attr('src', '/img/thumbs-up-animated.gif');
@@ -218,7 +238,7 @@
         const data = {
             id: parseInt(id),
         };
-
+        localStorage.setItem(deviceId + '-' + formattedDate, 'true');
         $.ajax({
             url: '/api/commendRestaurant.json',
             headers: {
@@ -233,4 +253,9 @@
             }
         });
     })
+
+    function generateID() {
+        return 'id_' + Math.random().toString(36).substr(2, 9);
+    }
+
 </script>

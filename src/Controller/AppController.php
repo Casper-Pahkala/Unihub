@@ -111,12 +111,40 @@ class AppController extends Controller
             }
         }
 
+        // August
+        $cachedMenu = Cache::read('august-' . FrozenTime::now()->format('Y-m-d'), 'menus');
+        if ($cachedMenu) {
+            if ($cachedMenu != 'closed') {
+                $menus[] = [
+                    'id' => 3,
+                    'name' => 'August',
+                    'menu' => $cachedMenu,
+                    'image' => '/img/august.png',
+                    'link' => 'https://augustrestaurant.fi/'
+                ];
+            }
+        } else {
+            $menu = $this->getAugustMenu();
+            if ($menu) {
+                Cache::write('august-' . FrozenTime::now()->format('Y-m-d'), $menu, 'menus');
+                $menus[] = [
+                    'id' => 3,
+                    'name' => 'August',
+                    'menu' => $menu,
+                    'image' => '/img/august.png',
+                    'link' => 'https://augustrestaurant.fi/'
+                ];
+            } else {
+                Cache::write('august-' . FrozenTime::now()->format('Y-m-d'), 'closed', 'menus');
+            }
+        }
+
         // Bacchus
         $cachedMenu = Cache::read('bacchus-' . FrozenTime::now()->format('Y-m-d'), 'menus');
         if ($cachedMenu) {
             if ($cachedMenu != 'closed') {
                 $menus[] = [
-                    'id' => 3,
+                    'id' => 4,
                     'name' => 'Bacchus',
                     'menu' => $cachedMenu,
                     'image' => '/img/bacchus.jpg',
@@ -128,7 +156,7 @@ class AppController extends Controller
             if ($bacchusMenu) {
                 Cache::write('bacchus-' . FrozenTime::now()->format('Y-m-d'), $bacchusMenu, 'menus');
                 $menus[] = [
-                    'id' => 3,
+                    'id' => 4,
                     'name' => 'Bacchus',
                     'menu' => $bacchusMenu,
                     'image' => '/img/bacchus.jpg',
@@ -161,16 +189,17 @@ class AppController extends Controller
         $commends = [
             '1' => 0,
             '2' => 0,
-            '3' => 0
+            '3' => 0,
+            '4' => 0
         ];
         foreach ($restaurantCommends as $commend) {
             $commends[$commend['restaurant_id']] += 1;
         }
         arsort($commends);
-        $topRestaurant = reset($commends);
         usort($menus, function($a, $b) use ($commends) {
             return $commends[$b['id']] <=> $commends[$a['id']];
         });
+        $topRestaurant = $menus[0]['id'];
         $this->set(compact('menus', 'canCommend', 'topRestaurant'));
     }
 
@@ -234,11 +263,13 @@ class AppController extends Controller
                     // $menu = explode('Viikon vege', $menu)[0];
                     $menus = explode("\n", $menu);
                     $realMenus = [];
+                    $i = 0;
                     foreach ($menus as &$menu) {
+                        $i++;
                         $menu = trim($menu);
                         if (!empty($menu)) {
                             $menu = preg_replace('/\xc2\xa0/', '', $menu);
-                            $realMenus[] = $menu;
+                            $realMenus[] = $menu . (($i !== count($menus) - 1) ? ' 2,95€' : ' 4,50€');
                         }
                     }
                     return $realMenus;
@@ -263,13 +294,12 @@ class AppController extends Controller
                 if (Time::now()->setTimezone('Europe/Helsinki')->format('N') == $key) {
                     $itemnameElements = $xpath->query("./*[2]//span[contains(@class, 'itemname')]", $priceList);
                     $realMenus = [];
+                    $i = 0;
                     foreach ($itemnameElements as $itemnameElement) {
+                        $i++;
                         $item = trim($itemnameElement->nodeValue);
-                        // $lg = explode(' (', $item);
                         $parts  = explode(' / ', $item);
                         $correctName = trim($parts[0]);
-
-                        // $item = $item . ' (' . $lg;
                         if (isset($parts[1])) {
                             $additionalParts = explode("(", $parts[1], 2);
                             if (isset($additionalParts[1])) {
@@ -278,12 +308,48 @@ class AppController extends Controller
                             }
                         }
                         $item = trim($correctName);
-                        $realMenus[] = $item;
+                        $realMenus[] = $item . (($i < count($itemnameElements)) ? ' 2,95€' : ' 5,60€');
                     }
                     return $realMenus;
                 }
             }
 
+        }
+        return false;
+    }
+
+    private function getAugustMenu() {
+        $http = new Client();
+        $response = $http->get('https://augustrestaurant.fi/');
+        if ($response->isOk()) {
+            $data = $response;
+            $htmlString = $data->getStringBody();
+            $doc = new \DOMDocument();
+            @$doc->loadHTML($htmlString);
+            $xpath = new \DOMXPath($doc);
+            $tables = $xpath->query("//div[contains(@class, 'et_pb_text_inner')]//table");
+
+            foreach ($tables as $key => $menu) {
+                if (Time::now()->setTimezone('Europe/Helsinki')->format('N') - 1 == $key) {
+                    $rows = $xpath->query(".//tr", $menu);
+                    $weekdays = [
+                        'Maanantai',
+                        'Tiistai',
+                        'Keskiviikko',
+                        'Torstai',
+                        'Perjantai'
+                    ];
+                    $menus = [];
+                    foreach ($rows as $row) {
+                        $row = trim($row->nodeValue);
+                        $row  = explode('/ ', $row)[0];
+                        if ($row != '' && !in_array($row, $weekdays)) {
+                            $menus[] = $row . ' ';
+                        }
+                    }
+                    return $menus;
+                }
+            }
         }
         return false;
     }
