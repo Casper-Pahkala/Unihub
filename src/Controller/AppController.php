@@ -199,7 +199,11 @@ class AppController extends Controller
         usort($menus, function($a, $b) use ($commends) {
             return $commends[$b['id']] <=> $commends[$a['id']];
         });
-        $topRestaurant = $menus[0]['id'];
+        if (!empty($menus)) {
+            $topRestaurant = $menus[0]['id'];
+        } else {
+            $topRestaurant = null;
+        }
         $this->set(compact('menus', 'canCommend', 'topRestaurant'));
     }
 
@@ -229,7 +233,7 @@ class AppController extends Controller
                     $realMenus = [];
                     foreach ($menus as &$menu) {
                         $menu = trim($menu);
-                        if (!empty($menu) && !str_contains($menu, 'Viikon Vege')) {
+                        if (!empty($menu) && !str_contains($menu, 'Viikon Vege') && $menu != '') {
                             $menu = preg_replace('/\xc2\xa0/', '', $menu);
                             $realMenus[] = $menu;
                         }
@@ -253,14 +257,8 @@ class AppController extends Controller
             $menuBody = $xpath->query("//div[contains(@class, 'article__body')]");
             $pElements = $xpath->query('.//p', $menuBody[0]);
             foreach ($pElements as $key => $menu) {
-                //Time::now()->setTimezone('Europe/Helsinki')->format('N') - 1
                 if (Time::now()->setTimezone('Europe/Helsinki')->format('N') - 1 == $key) {
                     $menu = $menu->nodeValue;
-                    // $menu = str_replace('p ( M G )', '', $menu);
-                    // $menu = str_replace(")", ")\n", $menu);
-                    // $menu = preg_replace('/\([^)]+\)/', '', $menu);
-                    // $menu = explode('Salaattipöytä – 12,70€', $menu)[1];
-                    // $menu = explode('Viikon vege', $menu)[0];
                     $menus = explode("\n", $menu);
                     $realMenus = [];
                     $i = 0;
@@ -269,7 +267,9 @@ class AppController extends Controller
                         $menu = trim($menu);
                         if (!empty($menu)) {
                             $menu = preg_replace('/\xc2\xa0/', '', $menu);
-                            $realMenus[] = $menu . (($i !== count($menus) - 1) ? ' 2,95€' : ' 4,50€');
+                            if ($menu != '') {
+                                $realMenus[] = $menu . (($i !== count($menus) - 1) ? ' 2,95€' : ' 4,50€');
+                            }
                         }
                     }
                     return $realMenus;
@@ -301,14 +301,17 @@ class AppController extends Controller
                         $parts  = explode(' / ', $item);
                         $correctName = trim($parts[0]);
                         if (isset($parts[1])) {
-                            $additionalParts = explode("(", $parts[1], 2);
+                            $additionalParts = explode(" (", $parts[1], 2);
                             if (isset($additionalParts[1])) {
-                                $additionalInfo = "(" . $additionalParts[1];
+                                $additionalInfo = " (" . $additionalParts[1];
                                 $correctName .= " " . trim($additionalInfo);
                             }
                         }
                         $item = trim($correctName);
-                        $realMenus[] = $item . (($i < count($itemnameElements)) ? ' 2,95€' : ' 5,60€');
+                        if ($item != '') {
+                            $realMenus[] = $item . (($i < count($itemnameElements)) ? ' 2,95€' : ' 5,60€');
+                        }
+                            
                     }
                     return $realMenus;
                 }

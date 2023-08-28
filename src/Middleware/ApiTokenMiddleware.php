@@ -27,7 +27,6 @@ class ApiTokenMiddleware
             if ($request->getHeaderLine('X-CSRF-Token')) {
 
             } else {
-
                 throw new UnauthorizedException('Invalid API token');
             }
         }

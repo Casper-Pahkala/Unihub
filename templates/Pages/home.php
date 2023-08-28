@@ -43,6 +43,12 @@
         align-items: center;
         justify-content: center;
         flex-wrap: wrap;
+        margin-top: 80px;
+    }
+    @media (max-width: 1199px) {
+        #quicklinks{
+            margin-top: 0;
+        }
     }
 
     .quicklink {

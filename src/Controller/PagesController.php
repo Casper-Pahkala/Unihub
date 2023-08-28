@@ -21,7 +21,8 @@ use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\View\Exception\MissingTemplateException;
-
+use Cake\Http\Client;
+use Minify;
 /**
  * Static content controller
  *
@@ -60,6 +61,18 @@ class PagesController extends AppController
             $subpage = $path[1];
         }
         $this->set(compact('page', 'subpage'));
+        if ($page == 'tickets') {
+            $this->loadModel('Tickets');
+            $tickets = $this->Tickets->find()
+                ->where([
+                    'deleted' => 0,
+                    'sold' => 0
+                ])
+                ->enableHydration(false)
+                ->toArray();
+
+            $this->set(compact('tickets'));
+        }
 
         try {
             return $this->render(implode('/', $path));

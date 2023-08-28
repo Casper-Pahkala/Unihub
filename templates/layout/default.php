@@ -9,7 +9,14 @@
     <title>
         UniHub
     </title>
-    <link rel="icon" type="image/x-icon" href="/img/UniHub-logo.jpg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!-- For Android Chrome -->
+    <link rel="icon" sizes="192x192" href="<?= $this->Url->webroot('android-chrome-192x192.png') ?>">
+    <link rel="icon" sizes="512x512" href="<?= $this->Url->webroot('android-chrome-512x512.png') ?>">
+
+    <!-- For Apple Touch -->
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= $this->Url->webroot('apple-touch-icon.png') ?>">
+
     <link href="https://fonts.googleapis.com/css?family=Raleway:400,700" rel="stylesheet">
 
     <?= $this->Html->css(['normalize.min', 'milligram.min', 'cake']) ?>
@@ -96,7 +103,14 @@
         }
 
         .main {
-            padding-top: 100px;
+            /* padding-top: 100px; */
+        }
+
+        .container {
+            max-width: 162rem;
+        }
+        footer {
+            height: 200px;
         }
     </style>
 </head>
