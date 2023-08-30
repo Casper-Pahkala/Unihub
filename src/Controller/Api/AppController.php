@@ -82,7 +82,8 @@ class AppController extends Controller
         if ($this->request->is('post')) {
             $data = $this->request->getData();
             $this->loadModel('Tickets');
-            $ticketId = $data['ticket']['id'];
+            $ticket = $data['ticket'];
+            $ticketId = $ticket['id'];
             $ticketModel = $this->Tickets->newEmptyEntity();
             $ticketModel->price = intval(trim($data['price']));
             $ticketApiUrl = "https://api.kide.app/api/views/wallet/product/$ticketId";
@@ -102,9 +103,13 @@ class AppController extends Controller
             // dd($eventId);
             $ticketModel->event_id = strval($eventId);
             $ticketModel->person_id = 1;
-            $ticketModel->event_url = "https://kide.app/events/$eventId";
+            $ticketModel->event_url = $ticket['productType'] == 1 ? "https://kide.app/events/$eventId" : "https://kide.app/products/$eventId";
             $responseData = ['message' => 'save failed', 'success' => false];
             $ticketInfo = $this->getTicketInfo($ticketId);
+            if (!$ticketInfo) {
+                $responseData = ['message' => 'ticket info fetch failed', 'success' => false, 'info' => $ticketId];
+                return $this->response->withType('application/json')->withStringBody(json_encode($responseData));
+            }
             $ticketModel->company_name = $ticketInfo['company_name'];
             $ticketModel->event_name = $ticketInfo['event_name'];
             $ticketModel->event_image = $ticketInfo['event_image'];
@@ -127,7 +132,6 @@ class AppController extends Controller
         $returnData = [];
         if ($response->isOk()) {
             $data = json_decode($response->getStringBody(), true)['model'];
-            dd($data);
             $returnData = [
                 'ticket_id' => '',
                 'company_name' => $data['company']['name'],
@@ -137,6 +141,8 @@ class AppController extends Controller
                 'event_date_to' => $data['product']['dateActualUntil'],
                 'location' => $data['product']['place'] . ', ' . $data['product']['streetAddress']
             ];
+        } else {
+            return false;
         }
         return $returnData;
     }

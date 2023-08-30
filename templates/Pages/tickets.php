@@ -8,7 +8,7 @@
 <style>
     .ticket {
         width: 400px;
-        height: 420px;
+        height: 480px;
         border-radius: 12px;
         background-color: rgb(70, 64, 84);
         overflow: hidden;
@@ -81,10 +81,18 @@
         padding: 40px 0;
     }
 
-    .add-to-cart-btn {
+    .actions-container {
         position: absolute;
         right: 10px;
         bottom: 10px;
+        display: flex;
+        gap: 20px;
+        left: 10px;
+        padding: 10px 20px;
+        justify-content: space-between;
+    }
+
+    .add-to-cart-btn {
         width: 44px;
         height: 44px;
         border-radius: 100px;
@@ -100,8 +108,23 @@
         -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     }
 
-    .add-to-cart-btn:hover {
-        scale: 1.08;
+    .add-to-cart-btn:hover, .kide-btn:hover {
+        scale: 1.04;
+    }
+
+    .kide-btn {
+        height: 44px;
+        width: 100px;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .truncate {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%; /* set a width for the truncation to take effect */
     }
 
 </style>
@@ -117,7 +140,7 @@
                 <img class="ticket-image" :src="constructImageUrl(ticket.event_image)">
             </div>
             <div class="ticket-info-container">
-                <div class="ticket-event-name">
+                <div class="ticket-event-name truncate">
                     {{ ticket.event_name }}
                 </div>
                 <div class="ticket-info" v-if="isValidEndDate(ticket.event_to)">
@@ -130,19 +153,28 @@
                     <span class="material-symbols-outlined">
                     location_on
                     </span>
-                    {{ ticket.location }}
+                    <div class="truncate">
+                        {{ ticket.location }}
+                    </div>
                 </div>
                 <div class="ticket-info">
                     <span class="material-symbols-outlined">
                     paid
                     </span>
-                    {{ ticket.price }}€
+                    <div class="truncate">
+                        {{ ticket.price }}€
+                    </div>
                 </div>
             </div>
-            <div class="add-to-cart-btn">
-                <span class="material-symbols-outlined">
-                    shopping_cart
-                </span>
+            <div class="actions-container">
+                <a class="kide-btn" :href="ticket.event_url" target="_blank">
+                    <img src="/img/kide-logo.jpg" class="kide-logo">
+                </a>
+                <div class="add-to-cart-btn">
+                    <span class="material-symbols-outlined">
+                        shopping_cart
+                    </span>
+                </div>
             </div>
         </div>
     </div>
