@@ -8,7 +8,7 @@
 <style>
     .ticket {
         width: 400px;
-        height: 480px;
+        height: 550px;
         border-radius: 12px;
         background-color: rgb(70, 64, 84);
         overflow: hidden;
@@ -96,7 +96,7 @@
         width: 44px;
         height: 44px;
         border-radius: 100px;
-        background: linear-gradient(to right, rgb(74, 105, 205), rgb(127, 80, 234));
+        background: linear-gradient(to bottom right, rgb(74, 105, 205) 0%, rgb(74, 105, 205) 20%, rgb(127, 80, 234) 100%);
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -142,6 +142,14 @@
             <div class="ticket-info-container">
                 <div class="ticket-event-name truncate">
                     {{ ticket.event_name }}
+                </div>
+                <div class="ticket-info">
+                    <span class="material-symbols-outlined">
+                    confirmation_number
+                    </span>
+                    <div class="truncate">
+                        {{ ticket.variant_name }}
+                    </div>
                 </div>
                 <div class="ticket-info" v-if="isValidEndDate(ticket.event_to)">
                     <span class="material-symbols-outlined">

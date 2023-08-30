@@ -128,6 +128,20 @@ class TicketsTable extends Table
             ->maxLength('location', 255)
             ->allowEmptyString('location');
 
+        $validator
+            ->scalar('variant_id')
+            ->maxLength('variant_id', 255)
+            ->allowEmptyString('variant_id');
+
+        $validator
+            ->scalar('variant_name')
+            ->maxLength('variant_name', 255)
+            ->allowEmptyString('variant_name');
+
+        $validator
+            ->integer('real_price')
+            ->allowEmptyString('real_price');
+
         return $validator;
     }
 

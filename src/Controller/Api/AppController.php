@@ -88,34 +88,31 @@ class AppController extends Controller
             $ticketModel->price = intval(trim($data['price']));
             $ticketApiUrl = "https://api.kide.app/api/views/wallet/product/$ticketId";
             
-            $http = new Client();
             $botAuthToken = $data['bot_auth_token'];
             $headers = [
                 'Host' => 'api.kide.app',
                 'Authorization' => "Bearer $botAuthToken",
             ];
-            $response = $http->get($ticketApiUrl, [], [
-                'headers' => $headers
-            ]);
-            $body = $response->getBody()->getContents();
-            $responseData = json_decode($body)->model[0];
-            $eventId = $responseData->productId;
-            // dd($eventId);
-            $ticketModel->event_id = strval($eventId);
-            $ticketModel->person_id = 1;
-            $ticketModel->event_url = $ticket['productType'] == 1 ? "https://kide.app/events/$eventId" : "https://kide.app/products/$eventId";
             $responseData = ['message' => 'save failed', 'success' => false];
-            $ticketInfo = $this->getTicketInfo($ticketId);
+           
+            $ticketInfo = $this->getTicketInfo($ticketId, $headers);
             if (!$ticketInfo) {
                 $responseData = ['message' => 'ticket info fetch failed', 'success' => false, 'info' => $ticketId];
                 return $this->response->withType('application/json')->withStringBody(json_encode($responseData));
             }
+            $eventId = $ticketInfo['product_id'];
+            $ticketModel->event_id = $eventId;
+            $ticketModel->person_id = 1;
+            $ticketModel->event_url = $ticket['productType'] == 1 ? "https://kide.app/events/$eventId" : "https://kide.app/products/$eventId";
             $ticketModel->company_name = $ticketInfo['company_name'];
             $ticketModel->event_name = $ticketInfo['event_name'];
             $ticketModel->event_image = $ticketInfo['event_image'];
             $ticketModel->event_from = $ticketInfo['event_date_from'];
             $ticketModel->event_to = $ticketInfo['event_date_to'];
             $ticketModel->location = $ticketInfo['location'];
+            $ticketModel->variant_id = $ticketInfo['variant_id'];
+            $ticketModel->variant_name = $ticketInfo['variant_name'];
+            $ticketModel->real_price = $ticketInfo['real_price'];
             $ticketModel->ticket_id = strval($ticketId);
             if ($this->Tickets->save($ticketModel)) {
 
@@ -126,20 +123,26 @@ class AppController extends Controller
     }
 
 
-    private function getTicketInfo($ticketId) {
+    private function getTicketInfo($ticketId, $headers) {
         $http = new Client();
-        $response = $http->get("https://api.kide.app/api/products/$ticketId");
+        $ticketApiUrl = "https://api.kide.app/api/views/wallet/product/$ticketId";
+        $response = $http->get($ticketApiUrl, [], [
+            'headers' => $headers
+        ]);
         $returnData = [];
         if ($response->isOk()) {
-            $data = json_decode($response->getStringBody(), true)['model'];
+            $data = json_decode($response->getStringBody(), true)['model'][0];
             $returnData = [
-                'ticket_id' => '',
-                'company_name' => $data['company']['name'],
-                'event_name' => $data['product']['name'],
-                'event_image' => $data['product']['mediaFilename'],
-                'event_date_from' => $data['product']['dateActualFrom'],
-                'event_date_to' => $data['product']['dateActualUntil'],
-                'location' => $data['product']['place'] . ', ' . $data['product']['streetAddress']
+                'product_id' => $data['productId'],
+                'company_name' => $data['companyName'],
+                'event_name' => $data['productName'],
+                'event_image' => $data['productMediaFilename'],
+                'event_date_from' => $data['dateActualFrom'],
+                'event_date_to' => $data['dateActualUntil'],
+                'location' => $data['place'] . ', ' . $data['streetAddress'],
+                'variant_id' => $data['variantId'],
+                'variant_name' => $data['variantName'],
+                'real_price' => $data['pricePerItem']
             ];
         } else {
             return false;
