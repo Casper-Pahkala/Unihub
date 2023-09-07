@@ -70,6 +70,10 @@ class TicketsTable extends Table
             ->allowEmptyString('price');
 
         $validator
+            ->integer('original_price')
+            ->allowEmptyString('original_price');
+
+        $validator
             ->scalar('ticket_id')
             ->maxLength('ticket_id', 255)
             ->notEmptyString('ticket_id');
@@ -137,10 +141,6 @@ class TicketsTable extends Table
             ->scalar('variant_name')
             ->maxLength('variant_name', 255)
             ->allowEmptyString('variant_name');
-
-        $validator
-            ->integer('real_price')
-            ->allowEmptyString('real_price');
 
         return $validator;
     }

@@ -112,10 +112,9 @@ class AppController extends Controller
             $ticketModel->location = $ticketInfo['location'];
             $ticketModel->variant_id = $ticketInfo['variant_id'];
             $ticketModel->variant_name = $ticketInfo['variant_name'];
-            $ticketModel->real_price = $ticketInfo['real_price'];
+            $ticketModel->original_price = $ticketInfo['real_price'];
             $ticketModel->ticket_id = strval($ticketId);
             if ($this->Tickets->save($ticketModel)) {
-
                 $responseData = ['message' => 'saved succesfully', 'success' => true];
             }
             return $this->response->withType('application/json')->withStringBody(json_encode($responseData));

@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <style>
     .ticket {
-        width: 400px;
+        width: 380px;
         height: 550px;
         border-radius: 12px;
         background-color: rgb(70, 64, 84);
@@ -124,7 +124,19 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        width: 100%; /* set a width for the truncation to take effect */
+        width: 100%;
+    }
+
+    .over-og-price {
+        color: #d12727;
+    }
+
+    .under-og-price {
+        color: #4fe94f;
+    }
+
+    .free-price-text {
+        color: #4fe94f;
     }
 
 </style>
@@ -145,7 +157,7 @@
                 </div>
                 <div class="ticket-info">
                     <span class="material-symbols-outlined">
-                    confirmation_number
+                        confirmation_number
                     </span>
                     <div class="truncate">
                         {{ ticket.variant_name }}
@@ -153,7 +165,7 @@
                 </div>
                 <div class="ticket-info" v-if="isValidEndDate(ticket.event_to)">
                     <span class="material-symbols-outlined">
-                    event
+                        event
                     </span>
                     {{ formatDate(ticket.event_from) }} - {{ formatDate(ticket.event_to) }}
                 </div>
@@ -167,10 +179,10 @@
                 </div>
                 <div class="ticket-info">
                     <span class="material-symbols-outlined">
-                    paid
+                        paid
                     </span>
                     <div class="truncate">
-                        {{ ticket.price }}€
+                        <span :class="ticket.price == 0 ? 'free-price-text' : ''">{{ getTicketPrice(ticket) }} </span><span v-if="ticket.price > 0" :class="getTicketDifference(ticket).overOgPrice ? 'over-og-price' : 'under-og-price'">{{ getTicketDifference(ticket).difference }}€</span>
                     </div>
                 </div>
             </div>
@@ -223,6 +235,19 @@
                 } else {
                     return true;
                 }
+            },
+            getTicketDifference(ticket) {
+                let difference = ticket.price - ticket.original_price;
+                let overOgPrice = true
+                let differenceText = '+' + difference;
+                if (difference < 0) {
+                    overOgPrice = false;
+                    differenceText = '-' + difference;
+                }
+                return { difference: differenceText, overOgPrice: overOgPrice};
+            },
+            getTicketPrice(ticket) {
+                return ticket.price > 0 ? (ticket.price + '€') : 'Ilmainen';
             }
         },
         mounted() {
