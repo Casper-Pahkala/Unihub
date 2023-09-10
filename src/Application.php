@@ -28,13 +28,20 @@ use Cake\ORM\Locator\TableLocator;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
 
+use Authentication\AuthenticationService;
+use Authentication\AuthenticationServiceInterface;
+use Authentication\AuthenticationServiceProviderInterface;
+use Authentication\Middleware\AuthenticationMiddleware;
+use Cake\Routing\Router;
+use Psr\Http\Message\ServerRequestInterface;
+
 /**
  * Application setup class.
  *
  * This defines the bootstrapping logic and middleware layers you
  * want to use in your application.
  */
-class Application extends BaseApplication
+class Application extends BaseApplication implements AuthenticationServiceProviderInterface
 {
     /**
      * Load all the application configuration and bootstrap logic.
@@ -45,7 +52,7 @@ class Application extends BaseApplication
     {
         // Call parent to load bootstrap from files.
         parent::bootstrap();
-
+        $this->addPlugin('ADmad/SocialAuth');
         if (PHP_SAPI === 'cli') {
             $this->bootstrapCli();
         } else {
@@ -62,7 +69,6 @@ class Application extends BaseApplication
         if (Configure::read('debug')) {
             $this->addPlugin('DebugKit');
         }
-
         // Load more plugins here
     }
 
@@ -95,7 +101,64 @@ class Application extends BaseApplication
             // using it's second constructor argument:
             // `new RoutingMiddleware($this, '_cake_routes_')`
             ->add(new RoutingMiddleware($this))
-
+            ->add(new \ADmad\SocialAuth\Middleware\SocialAuthMiddleware([
+                // Request method type use to initiate authentication.
+                'requestMethod' => 'POST',
+                // Login page URL. In case of auth failure user is redirected to login
+                // page with "error" query string var.
+                'loginUrl' => '/login',
+                // URL to redirect to after authentication (string or array).
+                'loginRedirect' => '/',
+                // Boolean indicating whether user identity should be returned as entity.
+                'userEntity' => false,
+                // User model.
+                'userModel' => 'Users',
+                // Social profile model.
+                'socialProfileModel' => 'ADmad/SocialAuth.SocialProfiles',
+                // Finder type.
+                'finder' => 'all',
+                // Fields.
+                'fields' => [
+                    'password' => 'password',
+                ],
+                // Session key to which to write identity record to.
+                'sessionKey' => 'Auth',
+                // The method in user model which should be called in case of new user.
+                // It should return a User entity.
+                'getUserCallback' => 'getUser',
+                // SocialConnect Auth service's providers config. https://github.com/SocialConnect/auth/blob/master/README.md
+                'serviceConfig' => [
+                    'provider' => [
+                        'facebook' => [
+                            'applicationId' => '<application id>',
+                            'applicationSecret' => '<application secret>',
+                            'scope' => [
+                                'email',
+                            ],
+                            'options' => [
+                                'identity.fields' => [
+                                    'email',
+                                    // To get a full list of all possible values, refer to
+                                    // https://developers.facebook.com/docs/graph-api/reference/user
+                                ],
+                            ],
+                        ],
+                        'google' => [
+                            'applicationId' => '270577235544-rtermudlcug7desccd5upopeikksc338.apps.googleusercontent.com',
+                            'applicationSecret' => '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',
+                            'scope' => [
+                                'https://www.googleapis.com/auth/userinfo.email',
+                                'https://www.googleapis.com/auth/userinfo.profile',
+                            ],
+                        ],
+                    ],
+                ],
+                // Instance of `\SocialConnect\Auth\CollectionFactory`. If none provided one will be auto created. Default `null`.
+                'collectionFactory' => null,
+                // Whether social connect errors should be logged. Default `true`.
+                'logErrors' => true,
+            ]))
+            ->add(new AuthenticationMiddleware($this))
             // Parse various types of encoded request bodies so that they are
             // available as array through $request->getData()
             // https://book.cakephp.org/4/en/controllers/middleware.html#body-parser-middleware
@@ -110,6 +173,34 @@ class Application extends BaseApplication
         });
 
         return $middlewareQueue;
+    }
+
+    public function getAuthenticationService(ServerRequestInterface $request): AuthenticationServiceInterface {
+        $authenticationService = new AuthenticationService([
+            'unauthenticatedRedirect' => Router::url('/login'),
+            'queryParam' => 'redirect',
+        ]);
+
+        // Load identifiers, ensure we check email and password fields
+        $authenticationService->loadIdentifier('Authentication.Password', [
+            'fields' => [
+                'username' => 'email',
+                'password' => 'password',
+            ]
+        ]);
+
+        // Load the authenticators, you want session first
+        $authenticationService->loadAuthenticator('Authentication.Session');
+        // Configure form data check to pick email and password
+        $authenticationService->loadAuthenticator('Authentication.Form', [
+            'fields' => [
+                'username' => 'email',
+                'password' => 'password',
+            ],
+            'loginUrl' => Router::url('/login'),
+        ]);
+
+        return $authenticationService;
     }
 
     /**

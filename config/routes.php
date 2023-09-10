@@ -56,8 +56,15 @@ return static function (RouteBuilder $routes) {
          * ...and connect the rest of 'Pages' controller's URLs.
          */
         $builder->connect('/*', 'Pages::display');
-        $builder->connect('/tickets', ['controller' => 'Pages', 'action' => 'display', 'tickets']);
-        $builder->connect('/sell-ticket', ['controller' => 'Pages', 'action' => 'display', 'sellTicket']);
+        $builder->connect('/tickets', ['controller' => 'Tickets', 'action' => 'index']);
+        $builder->connect('/tickets/sell', ['controller' => 'Tickets', 'action' => 'sellTicket']);
+        $builder->connect('/login', ['controller' => 'Users', 'action' => 'login']);
+        $builder->connect('/logout', ['controller' => 'Users', 'action' => 'logout']);
+        $builder->connect('/register', ['controller' => 'Users', 'action' => 'register']);
+        $builder->connect('/callback', ['controller' => 'Users', 'action' => 'callback']);
+        $builder->connect('/auth/callback/google', ['controller' => 'Users', 'action' => 'googleCallback']);
+
+
         /*
          * Connect catchall routes for all controllers.
          *
@@ -96,6 +103,7 @@ return static function (RouteBuilder $routes) {
         $routes->registerMiddleware('apiToken', new ApiTokenMiddleware());
         $routes->applyMiddleware('apiToken');
         $routes->connect('/:action', ['controller' => 'App'], ['pass' => ['action']]);
+        $routes->connect('/get-user/*', ['controller' => 'App', 'action' => 'getUser']);
         $routes->fallbacks();
     });
 };

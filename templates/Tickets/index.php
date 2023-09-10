@@ -212,7 +212,10 @@
         },
         methods: {
             goToSell() {
-                window.location.href = '<?= $this->Url->build(['controller' => 'pages', 'action' => 'display', 'sellTicket']);?>';
+                window.location.href = '<?= $this->Url->build(['controller' => 'Tickets', 'action' => 'sellTicket']);?>';
+            },
+            goToLogin() {
+                window.location.href = '<?= $this->Url->build(['controller' => 'Users', 'action' => 'login']);?>';
             },
             constructImageUrl(imageId) {
                 return 'https://portalvhdsp62n0yt356llm.blob.core.windows.net/bailataan-mediaitems/' + imageId;

@@ -273,6 +273,9 @@
                         Aikaa jäljellä: 
                         <div class="info-value">{{ secondsToMinutes(timeLeft) }}</div>
                     </div>
+                    <div class="btn back-button" @click="cancelTrade">
+                        Peruuta
+                    </div>
                 </div>
                 <div class="info-container" v-if="ticketReceived">
 
@@ -287,7 +290,7 @@
     new Vue({
         el: '#app',
         data: {
-            kideEmail: null,
+            kideEmail: '<?= $user->email ?>',
             ticketPrice: 5,
             emailInserted: false,
             socket: null,
@@ -299,7 +302,8 @@
             timeLeft: 300,
             actualTimeLeft: 300,
             sellingExpired: false,
-            ticketReceived: false
+            ticketReceived: false,
+            token: '<?= $token ?>'
         },
         computed: {
             canContinue() {
@@ -315,7 +319,6 @@
                 $('#email-container').css('transform', 'translateX(-800px)');
                 $('#trade-container').css('transform', 'translateX(0)');
                 this.startSellingProcess();
-                this.connectToWebSocket();
             },
             startSellingProcess() {
                 if (this.connectedToWebSocket) {
@@ -324,7 +327,7 @@
                         let data = {
                             message: 'start_sell',
                             email: this.kideEmail,
-                            price: this.ticketPrice
+                            price: this.ticketPrice,
                         };
                         this.socket.send(JSON.stringify(data));
                         this.findBotMessage = 'Etsitään bottia';
@@ -356,10 +359,17 @@
                     this.ticketReceived = true;
                     this.mainBotMessage = 'Lippu vastaanotettu'
                 }
+                if (data.message === 'already_in_trade') {
+                    $('#email-container').css('transform', 'translateX(-800px)');
+                    $('#trade-container').css('transform', 'translateX(0)');
+                    this.botEmail = data.bot_email;
+                    this.botConfirmed = true;
+                    this.countSecondsDown();
+                }
             },
             connectToWebSocket() {
                 console.log('connecting');
-                this.socket = new WebSocket('wss://unihub.fi:4040');
+                this.socket = new WebSocket(`wss://unihub.fi:4040?token=${this.token}`);
                 const self = this;
                 this.socket.onmessage = function(event) {
                     var data = JSON.parse(event.data);
@@ -408,7 +418,14 @@
                 }, 1000);
             },
             backToSell() {
-                window.location.href = '<?= $this->Url->build(['controller' => 'pages', 'action' => 'display', 'sellTicket']);?>';
+                window.location.href = '<?= $this->Url->build(['controller' => 'Tickets', 'action' => 'sellTicket']);?>';
+            },
+            cancelTrade() {
+                let data = {
+                    message: 'cancel_trade',
+                };
+                this.socket.send(JSON.stringify(data));
+                this.backToSell();
             }
         },
         mounted() {
@@ -418,6 +435,7 @@
                     self.continueToTrade();
                 }
             });
+            this.connectToWebSocket();
         },
     });
 </script>

@@ -21,6 +21,10 @@ use Cake\I18n\Time;
 use Cake\I18n\FrozenTime;
 use Cake\Http\Client;
 use Cake\Cache\Cache;
+use League\OAuth2\Client\Provider\Google;
+use Cake\Core\Configure;
+use Firebase\JWT\JWT;
+use Cake\Http\Cookie\Cookie;
 /**
  * Application Controller
  *
@@ -46,7 +50,7 @@ class AppController extends Controller
 
         $this->loadComponent('RequestHandler');
         $this->loadComponent('Flash');
-
+        $this->loadComponent('Authentication.Authentication');
         /*
          * Enable the following component for recommended CakePHP form protection settings.
          * see https://book.cakephp.org/4/en/controllers/components/form-protection.html
@@ -204,7 +208,22 @@ class AppController extends Controller
         } else {
             $topRestaurant = null;
         }
-        $this->set(compact('menus', 'canCommend', 'topRestaurant'));
+        $user = $this->Authentication->getIdentity();
+        $token = $this->request->getCookie('jwt');
+        if (!$token && $user) {
+            $token = $this->addTokenCookie($user);
+        }
+        if (!$user) {
+            $expiredCookie = new \Cake\Http\Cookie\Cookie(
+                'jwt', // Name of the cookie
+                '', // Empty value
+                new \DateTime('-1 day'), // Setting expiration to 1 day in the past
+                '/', // Path
+                ''  // Domain
+            );
+            $this->response = $this->response->withCookie($expiredCookie);
+        }
+        $this->set(compact('menus', 'canCommend', 'topRestaurant', 'user', 'token'));
     }
 
 
@@ -355,5 +374,27 @@ class AppController extends Controller
             }
         }
         return false;
+    }
+
+    private function addTokenCookie($user) {
+        $key = Configure::read('JWT.SecretKey'); // keep this secret and safe!
+        $payload = [
+            "id" => $user->id,
+            "email" => $user->email,
+            "exp" => time() + (60*60) // expires in 1 hour
+        ];
+        
+        $token = JWT::encode($payload, $key, 'HS256');
+        $cookie = new Cookie(
+            'jwt',      // Name of the cookie
+            $token,     // Value of the cookie
+            new \DateTime('+1 hour'),  // Expiration time, you can adjust as needed
+            '/',        // Path
+            '',         // Domain 
+            true,      // Secure (set to true if you're using HTTPS)
+            true        // HttpOnly
+        );
+        $this->response = $this->response->withCookie($cookie);
+        return $token;
     }
 }

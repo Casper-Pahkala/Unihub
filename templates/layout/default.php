@@ -1,5 +1,6 @@
 <?php
-
+// dd($user);
+$controllerName = $this->request->getParam('controller');
 ?>
 <!DOCTYPE html>
 <html>
@@ -9,7 +10,7 @@
     <title>
         UniHub
     </title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <!-- For Android Chrome -->
     <link rel="icon" sizes="192x192" href="<?= $this->Url->webroot('android-chrome-192x192.png') ?>">
     <link rel="icon" sizes="512x512" href="<?= $this->Url->webroot('android-chrome-512x512.png') ?>">
@@ -123,24 +124,28 @@
             <img id="logo" src="/img/UniHub-logo.jpg">
         </a>
         <div class="navigation-items">
-            <a class="nav-item selected" href="/">
+            <a class="nav-item <?= $controllerName == 'Pages' ? 'selected' : '' ?>" href="/">
                 Etusivu
             </a>
-            <!-- <div class="nav-seperator"></div>
-            <div class="nav-item">
-                Lipun myynti
-            </div>
             <div class="nav-seperator"></div>
+            <a class="nav-item <?= $controllerName == 'Tickets' ? 'selected' : '' ?>" href="/tickets">
+                Liput
+            </a>
+            <!-- <div class="nav-seperator"></div>
             <div class="nav-item">
                 Keskustelut
             </div> -->
         </div>
+        <?php if ($user): ?>
+            <a id="profile-button" href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'logout']);?>">
+                <span class="material-symbols-rounded" style="font-size: 28px;">
+                    person
+                </span>
+            </a>
+        <?php else: ?>
+            <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login']);?>">Kirjaudu sisään</a>
+        <?php endif; ?>
 
-        <div id="profile-button">
-        <!-- <span class="material-symbols-rounded" style="font-size: 28px;">
-            person
-        </span> -->
-        </div>
     </nav>
     <main class="main">
         <div class="container">

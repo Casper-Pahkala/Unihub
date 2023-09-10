@@ -4,9 +4,10 @@ use Cake\Controller\Controller;
 use Cake\I18n\Time;
 use Cake\I18n\FrozenTime;
 use Cake\Http\Client;
-
+use Firebase\JWT\JWT;
+use Cake\Core\Configure;
+use Firebase\JWT\Key;
 class AppController extends Controller
-
 {
     public function initialize(): void
     {
@@ -147,5 +148,25 @@ class AppController extends Controller
             return false;
         }
         return $returnData;
+    }
+
+    public function getUser($token) {
+        $responseData = [
+            'error' => true,
+            'user' => null,
+            'message' => ''
+        ];
+        try {
+            $algorithms = ['HS256'];
+            $decoded = JWT::decode($token, new Key(Configure::read('JWT.SecretKey'), 'HS256'));
+            $responseData = [
+                'error' => false,
+                'user' => $decoded
+            ];
+            
+        } catch (\Exception $e) {
+            $responseData['message'] = $e->getMessage();
+        }
+        return $this->response->withType('application/json')->withStringBody(json_encode($responseData));
     }
 }

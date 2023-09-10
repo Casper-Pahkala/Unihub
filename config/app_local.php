@@ -15,7 +15,7 @@ return [
      * Development Mode:
      * true: Errors and warnings shown.
      */
-    'debug' => filter_var(env('DEBUG', false), FILTER_VALIDATE_BOOLEAN),
+    'debug' => filter_var(env('DEBUG', true), FILTER_VALIDATE_BOOLEAN),
 
     /*
      * Security and encryption configuration
@@ -85,4 +85,27 @@ return [
             'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null),
         ],
     ],
+
+    'OAuth' => [
+        'clientId' => '270577235544-rtermudlcug7desccd5upopeikksc338.apps.googleusercontent.com',
+        'clientSecret' => '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',
+        'redirectUri' => 'https://unihub.fi/callback',
+        // other configurations specific to the provider
+    ],
+
+    'SocialAuth' => [
+        'providers' => [
+            'google' => [
+                'className' => 'League\OAuth2\Client\Provider\Google',
+                'options' => [
+                    'clientId' => '270577235544-rtermudlcug7desccd5upopeikksc338.apps.googleusercontent.com',
+                    'clientSecret' => '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',
+                    'redirectUri' => 'https://unihub.com/social-auth/callback/google'
+                ],
+            ],
+        ],
+    ],
+    'JWT' => [
+        'SecretKey' => 'kjashgfjkhasgfasjtghakrasf383jhbkjbgfaksj'
+    ]
 ];
