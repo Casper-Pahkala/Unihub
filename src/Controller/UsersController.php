@@ -100,5 +100,9 @@ class UsersController extends AppController
             return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
         }
     }
+
+    public function account() {
+        
+    }
     
 }

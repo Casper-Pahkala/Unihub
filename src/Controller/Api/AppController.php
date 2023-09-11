@@ -103,7 +103,7 @@ class AppController extends Controller
             }
             $eventId = $ticketInfo['product_id'];
             $ticketModel->event_id = $eventId;
-            $ticketModel->person_id = 1;
+            $ticketModel->person_id = $data['user']['id'];
             $ticketModel->event_url = $ticket['productType'] == 1 ? "https://kide.app/events/$eventId" : "https://kide.app/products/$eventId";
             $ticketModel->company_name = $ticketInfo['company_name'];
             $ticketModel->event_name = $ticketInfo['event_name'];
@@ -114,7 +114,19 @@ class AppController extends Controller
             $ticketModel->variant_id = $ticketInfo['variant_id'];
             $ticketModel->variant_name = $ticketInfo['variant_name'];
             $ticketModel->original_price = $ticketInfo['real_price'];
-            $ticketModel->ticket_id = strval($ticketId);
+            $ticketModel->ticket_id = $ticketInfo['ticket_id'];
+            $ticketModel->bot_id = $data['bot_id'];
+            $ticket = $this->Tickets->find()
+                ->where([
+                    'variant_id' => $ticketInfo['variant_id'],
+                    'deleted' => 0,
+                    'sold' => 0,
+                ])
+                ->first();
+            if ($ticket) {
+                $responseData = ['message' => 'Ticket already exists', 'success' => false];
+                return $this->response->withType('application/json')->withStringBody(json_encode($responseData));
+            }
             if ($this->Tickets->save($ticketModel)) {
                 $responseData = ['message' => 'saved succesfully', 'success' => true];
             }
@@ -142,7 +154,8 @@ class AppController extends Controller
                 'location' => $data['place'] . ', ' . $data['streetAddress'],
                 'variant_id' => $data['variantId'],
                 'variant_name' => $data['variantName'],
-                'real_price' => $data['pricePerItem']
+                'real_price' => $data['pricePerItem'],
+                'ticket_id' => $data['id']
             ];
         } else {
             return false;
@@ -168,5 +181,51 @@ class AppController extends Controller
             $responseData['message'] = $e->getMessage();
         }
         return $this->response->withType('application/json')->withStringBody(json_encode($responseData));
+    }
+
+    public function sendTicketBackToUser() {
+        
+
+        $this->request->allowMethod(['post']);
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+            $user = JWT::decode($data['token'], new Key(Configure::read('JWT.SecretKey'), 'HS256'));
+            $payload = [
+                "variantId" => $data['variant_id'],
+                "userInventoryId" => $data['ticket_id'],
+                "recipientEmail" => 'casper.pahkala@gmail.com'
+            ];
+
+            $botAuthToken = $data['bot_auth_token'];
+            $headers = [
+                'Host' => 'api.kide.app',
+                'Authorization' => "Bearer $botAuthToken",
+                'Content-Type' => 'application/json'
+            ];
+            $http = new Client();
+            $apiUrl = "https://api.kide.app/api/users/transferUserVariant";
+            $response = $http->post($apiUrl, json_encode($payload), [
+                'headers' => $headers
+            ]);
+            $returnData = [
+                'error' => true
+            ];
+            if ($response->isOk()) {
+                // $data = json_decode($response->getStringBody(), true)['model'][0];
+                $this->loadModel('Tickets');
+                $ticket = $this->Tickets->find()
+                ->where([
+                    'variant_id' => $data['variant_id'],
+                    'deleted' => 0,
+                    'sold' => 0,
+                ])
+                ->first();
+                $ticket->deleted = true;
+                if ($this->Tickets->save($ticket)) {
+                    $returnData['error'] = false;
+                }
+            }
+            return $this->response->withType('application/json')->withStringBody(json_encode($returnData));
+        }
     }
 }

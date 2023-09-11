@@ -33,4 +33,19 @@ class TicketsController extends AppController
    public function sellTicket() {
 
    }
+
+   public function myTickets() {
+        $user = $this->Authentication->getIdentity();
+        $this->loadModel('Tickets');
+        $tickets = $this->Tickets->find()
+            ->where([
+                'deleted' => 0,
+                'sold' => 0,
+                'person_id' => $user->id
+            ])
+            ->enableHydration(false)
+            ->toArray();
+
+        $this->set(compact('tickets'));
+   }
 }

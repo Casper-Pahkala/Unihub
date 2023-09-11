@@ -142,6 +142,11 @@ class TicketsTable extends Table
             ->maxLength('variant_name', 255)
             ->allowEmptyString('variant_name');
 
+        $validator
+            ->scalar('bot_id')
+            ->maxLength('bot_id', 255)
+            ->allowEmptyString('bot_id');
+
         return $validator;
     }
 

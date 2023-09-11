@@ -28,6 +28,8 @@ $controllerName = $this->request->getParam('controller');
     <?= $this->Html->script('/js/jquery/jquery.js'); ?>
     <?= $this->Html->meta('csrfToken', $this->request->getAttribute('csrfToken')); ?>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
 
         head, body {
@@ -66,6 +68,7 @@ $controllerName = $this->request->getParam('controller');
             /* background: rgb(111, 115, 165); */
             background-color: rgb(29, 26, 37);
             cursor: pointer;
+            position: relative;
         }
 
         .nav-item {
@@ -113,6 +116,68 @@ $controllerName = $this->request->getParam('controller');
         footer {
             height: 200px;
         }
+
+        .account-actions-container {
+            list-style: none;
+            width: 250px;
+            background-color: rgb(65 60 77);
+            border-radius: 6px;
+            position: absolute;
+            top: 5px;
+            right: 0;
+            z-index: 100;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            display: none;
+            transform-origin: top;
+            transform: scaleY(0);
+        }
+
+        .account-action-item {
+            padding: 10px 20px;
+            margin-bottom: 0px;
+            color: #fff;
+            font-family: 'Roboto';
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .account-action-item:hover {
+            background-color: rgb(74, 70, 85);
+        }
+
+        .account-actions-container.open {
+            transform: scaleY(1);
+        }
+
+        #login-btn {
+            background-color: rgb(57, 52, 71);
+            border-radius: 100px;
+            color: #fff;
+            padding: 3px 16px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        #login-btn:hover {
+            background-color: rgb(70 59 101);
+        }
+
+        .no-select {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+        }
+
+        .page-title {
+            margin-left: 15%;
+            color: #fff;
+            margin-bottom: 40px;
+            font-family: 'Rubik';
+        }
     </style>
 </head>
 <body>
@@ -137,13 +202,20 @@ $controllerName = $this->request->getParam('controller');
             </div> -->
         </div>
         <?php if ($user): ?>
-            <a id="profile-button" href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'logout']);?>">
+            <div id="profile-button" href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'logout']);?>">
                 <span class="material-symbols-rounded" style="font-size: 28px;">
                     person
                 </span>
-            </a>
+
+                <ul class="account-actions-container">
+                    <li class="account-action-item" id="profile-action-btn">Tili</li>
+                    <li class="account-action-item" id="tickets-action-btn">Omat liput</li>
+                    <li class="account-action-item" id="tickets-action-btn">Historia</li>
+                    <li class="account-action-item" id="logout-action-btn">Kirjaudu ulos</li>
+                </ul>
+            </div>
         <?php else: ?>
-            <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login']);?>">Kirjaudu sisään</a>
+            <div id="login-btn" href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login']);?>">Kirjaudu sisään</div>
         <?php endif; ?>
 
     </nav>
@@ -155,5 +227,49 @@ $controllerName = $this->request->getParam('controller');
     </main>
     <footer>
     </footer>
+
+    <script>
+
+
+        $('#profile-button').click(function() {
+            showProfileActions();
+        });
+
+        function showProfileActions() {
+            $('.account-actions-container').show();
+            setTimeout(() => {
+                $('.account-actions-container').addClass('open');
+            }, 10);
+        }
+
+        function closeProfileActions() {
+            $('.account-actions-container').removeClass('open');
+            setTimeout(() => {
+                $('.account-actions-container').hide();
+            }, 200);
+        }
+
+        $(document).click(function(e) {
+            if (!$(e.target).closest('#profile-button').length) {
+                closeProfileActions();
+            }
+        });
+
+        $('#profile-action-btn').click(function() {
+            window.location.href = '<?= $this->Url->build(['controller' => 'Users', 'action' => 'account']);?>';
+        });
+
+        $('#tickets-action-btn').click(function() {
+            window.location.href = '<?= $this->Url->build(['controller' => 'Tickets', 'action' => 'myTickets']);?>';
+        });
+
+        $('#login-btn').click(function() {
+            window.location.href = '<?= $this->Url->build(['controller' => 'Users', 'action' => 'login']);?>';
+        });
+
+        $('#logout-action-btn').click(function() {
+            window.location.href = '<?= $this->Url->build(['controller' => 'Users', 'action' => 'logout']);?>';
+        });
+    </script>
 </body>
 </html>

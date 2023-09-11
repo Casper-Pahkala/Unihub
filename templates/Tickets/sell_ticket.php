@@ -3,7 +3,7 @@
 ?>
 <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
 <style>
     @keyframes ldio-1yilrkwwxrjh-o {
         0%    { opacity: 1; transform: translate(0 0) }
@@ -152,7 +152,7 @@
         display: flex;
         align-items: center;
         flex-direction: column;
-        gap: 20px;
+        gap: 10px;
     }
     .info {
         display: flex;
@@ -200,7 +200,7 @@
 
     .back-button {
         margin: auto;
-        margin-top: 110px;
+        margin-top: 60px;
     }
     .input-info {
         color: #ccc;
@@ -230,11 +230,11 @@
         <div id="email-container" v-if="!emailInserted">
             <div class="title">1. Syötä tiedot</div>
             <div class="info-container">
-                <div class="info-element">
+                <!-- <div class="info-element">
                     <span class="input-title">Kide sähköpostisi </span>
                     <span class="input-info">(Lippusi lähetetään takaisin tähän osoitteeseen)</span>
                     <input v-model="kideEmail" id="email-input" placeholder="pekka@gmail.com" type="email">
-                </div>
+                </div> -->
                 <div class="info-element">
                     <div class="input-title">Lipun hinta</div>
                     <div style="display: flex; align-items:center; gap:5px">
@@ -243,7 +243,7 @@
                     </div>
                 </div>
             </div>
-            <div class="btn next-button" :class="!canContinue ? 'disabled' : ''" @click="canContinue ? continueToTrade() : null">
+            <div class="btn next-button no-select" :class="!canContinue ? 'disabled' : ''" @click="canContinue ? continueToTrade() : null">
                 Seuraava
             </div>
         </div>
@@ -266,14 +266,18 @@
                 </div>
                 <div class="info-container" v-if="!sellingExpired && !ticketReceived">
                     <div class="info">
-                        Vastaanottaja: 
+                        Lähetä lippu käyttäjälle: 
                         <div class="info-value">{{ botEmail }}</div>
                     </div>
                     <div class="info">
                         Aikaa jäljellä: 
                         <div class="info-value">{{ secondsToMinutes(timeLeft) }}</div>
                     </div>
-                    <div class="btn back-button" @click="cancelTrade">
+                    <div class="info">
+                        Myyntihinta: 
+                        <div class="info-value">{{ ticketPrice }}€</div>
+                    </div>
+                    <div class="btn back-button no-select" @click="cancelTrade">
                         Peruuta
                     </div>
                 </div>
@@ -290,7 +294,7 @@
     new Vue({
         el: '#app',
         data: {
-            kideEmail: '<?= $user->email ?>',
+            // kideEmail: '<?= $user->email ?>',
             ticketPrice: 5,
             emailInserted: false,
             socket: null,
@@ -308,7 +312,8 @@
         computed: {
             canContinue() {
                 let pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-                return pattern.test(this.kideEmail) && this.ticketPrice && this.ticketPrice != '';
+                // return pattern.test(this.kideEmail) && 
+                return this.ticketPrice && this.ticketPrice != '';
             }
         },
         methods: {
@@ -326,7 +331,7 @@
                         console.log('sending message');
                         let data = {
                             message: 'start_sell',
-                            email: this.kideEmail,
+                            // email: this.kideEmail,
                             price: this.ticketPrice,
                         };
                         this.socket.send(JSON.stringify(data));
@@ -364,6 +369,7 @@
                     $('#trade-container').css('transform', 'translateX(0)');
                     this.botEmail = data.bot_email;
                     this.botConfirmed = true;
+                    this.ticketPrice = data.price;
                     this.countSecondsDown();
                 }
             },

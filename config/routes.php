@@ -58,11 +58,12 @@ return static function (RouteBuilder $routes) {
         $builder->connect('/*', 'Pages::display');
         $builder->connect('/tickets', ['controller' => 'Tickets', 'action' => 'index']);
         $builder->connect('/tickets/sell', ['controller' => 'Tickets', 'action' => 'sellTicket']);
+        $builder->connect('/my-tickets', ['controller' => 'Tickets', 'action' => 'myTickets']);
         $builder->connect('/login', ['controller' => 'Users', 'action' => 'login']);
         $builder->connect('/logout', ['controller' => 'Users', 'action' => 'logout']);
         $builder->connect('/register', ['controller' => 'Users', 'action' => 'register']);
-        $builder->connect('/callback', ['controller' => 'Users', 'action' => 'callback']);
         $builder->connect('/auth/callback/google', ['controller' => 'Users', 'action' => 'googleCallback']);
+        $builder->connect('/account', ['controller' => 'Users', 'action' => 'account']);
 
 
         /*

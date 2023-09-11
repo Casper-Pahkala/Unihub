@@ -27,7 +27,7 @@ use Cake\ORM\Entity;
  * @property string|null $location
  * @property string|null $variant_id
  * @property string|null $variant_name
- * @property int|null $real_price
+ * @property string|null $bot_id
  *
  * @property \App\Model\Entity\Ticket[] $tickets
  */
@@ -61,7 +61,7 @@ class Ticket extends Entity
         'location' => true,
         'variant_id' => true,
         'variant_name' => true,
-        'real_price' => true,
+        'bot_id' => true,
         'tickets' => true,
     ];
 }
