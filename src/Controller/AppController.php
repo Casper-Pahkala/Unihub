@@ -223,7 +223,22 @@ class AppController extends Controller
             );
             $this->response = $this->response->withCookie($expiredCookie);
         }
+
         $this->set(compact('menus', 'canCommend', 'topRestaurant', 'user', 'token'));
+
+        $this->loadModel('Users');
+        if ($user) {
+            if (!$user['username']) {
+                $controllerName = $this->request->getParam('controller');
+                $actionName = $this->request->getParam('action');
+                $dontShowNavigation = true;
+                $onBoarding = true;
+                $this->set(compact('dontShowNavigation', 'onBoarding'));
+                if ($controllerName != 'Users' || $actionName != 'additionalInfo') {
+                    $this->redirect(['controller' => 'Users', 'action' => 'additionalInfo']);
+                }
+            }
+        }
     }
 
 

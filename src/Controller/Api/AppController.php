@@ -190,10 +190,12 @@ class AppController extends Controller
         if ($this->request->is('post')) {
             $data = $this->request->getData();
             $user = JWT::decode($data['token'], new Key(Configure::read('JWT.SecretKey'), 'HS256'));
+            $this->loadModel('Users');
+            $userModel = $this->Users->get($user->id);
             $payload = [
                 "variantId" => $data['variant_id'],
                 "userInventoryId" => $data['ticket_id'],
-                "recipientEmail" => 'casper.pahkala@gmail.com'
+                "recipientEmail" => $userModel->kide_email
             ];
 
             $botAuthToken = $data['bot_auth_token'];

@@ -1,42 +1,75 @@
-<!-- templates/Users/register.php -->
+<?= $this->Flash->render() ?>
 
-<h2>Register</h2>
+<h2 class="page-title">Luo käyttäjä</h2>
 
-<?= $this->Form->create($user) ?>
+<style>
+.container {
+    max-width: 380px;
+}
+
+.main {
+    padding-top: 100px;
+}
+
+.already-account-container {
+    text-align: center;
+    color: #d3d3d3;
+}
+
+/* .form-input:not(:placeholder-shown) {
+    border: 1px solid #4ca1f5 !important;
+} */
+
+</style>
+<?php
+$this->Form->setTemplates([
+    'inputContainer' => '<div class="input {{type}}{{required}}">{{content}}<span>{{labelText}}</span></div>',
+]);
+
+?>
+<?= $this->Form->create($userToCreate) ?>
     <fieldset>
-        <legend><?= __('Create Account') ?></legend>
-        
-        <?= $this->Form->control('username', [
-            'required' => true,
-            'label' => 'Username'
-        ]) ?>
-        
-        <?= $this->Form->control('password', [
-            'required' => true,
-            'label' => 'Password'
-        ]) ?>
+        <div class="input-wrapper">
+            <?= $this->Form->control('email', ['required' => true, 'class' => 'form-input', 'label' => false, 'placeholder' => ' ', 'templateVars' => ['labelText' => 'Sähköposti']]) ?>
+        </div>
 
-        <?= $this->Form->control('email', [
-            'type' => 'email',
-            'required' => true,
-            'label' => 'Email'
-        ]) ?>
-        
+        <div class="input-wrapper">
+            <?= $this->Form->control('password', ['required' => true, 'class' => 'form-input', 'label' => false, 'placeholder' => ' ', 'templateVars' => ['labelText' => 'Salasana']]) ?>
+        </div>
+
+        <div class="input-wrapper">
+            <?= $this->Form->control('confirm_password', ['required' => true, 'class' => 'form-input', 'label' => false, 'placeholder' => ' ', 'templateVars' => ['labelText' => 'Vahvista salasana'], 'type' => 'password']) ?>
+        </div>
     </fieldset>
+<?= $this->Form->button('Jatka', ['class' => 'login-btn']); ?>
+<?= $this->Form->end() ?>
 
-    <?= $this->Form->button(__('Register')) ?>
-    <?= $this->Form->end() ?>
+<div class="already-account-container">
+    <span>
+        Onko sinulla jo tili?
+    </span>
+    <a href="/login">
+        Kirjaudu sisään
+    </a>
+</div>
 
+<div class="seperator">
+    <span>TAI<span>
+</div>
+<div class="social-login-container">
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 48 48" class="social-login-icon"><g><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></g></svg>
     <?php
-    echo $this->Form->postLink(
-        'Login with Google',
-        [
-            'prefix' => false,
-            'plugin' => 'ADmad/SocialAuth',
-            'controller' => 'Auth',
-            'action' => 'login',
-            'provider' => 'google',
-            '?' => ['redirect' => $this->request->getQuery('redirect')]
-        ]
-    );
+        echo $this->Form->postLink(
+            'Jatka Google-tilillä',
+            [
+                'prefix' => false,
+                'plugin' => 'ADmad/SocialAuth',
+                'controller' => 'Auth',
+                'action' => 'login',
+                'provider' => 'google',
+                '?' => ['redirect' => $this->request->getQuery('redirect')]
+            ],
+            ['class' => 'social-login-btn']
+        );
     ?>
+</div>

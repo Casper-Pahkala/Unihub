@@ -253,9 +253,6 @@
             getTicketPrice(ticket) {
                 return ticket.price > 0 ? (ticket.price + '€') : 'Ilmainen';
             },
-            deleteTicket() {
-
-            },
             connectToWebSocket() {
                 console.log('connecting');
                 this.socket = new WebSocket(`wss://unihub.fi:4040?token=${this.token}`);
@@ -288,8 +285,8 @@
                     }, 1000);
                 };
             },
-
             deleteTicket(ticket) {
+                this.tickets = this.tickets.filter(t => t.id != ticket.id)
                 let data = {
                     message: 'delete_ticket',
                     bot_id: ticket.bot_id,

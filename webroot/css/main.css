@@ -1,0 +1,239 @@
+.social-login-btn:hover {
+    color: #fff;
+    background-color: #121212;
+}
+.login-btn {
+    color: #fff;
+    width: 100% !important;
+    display: block;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    border-radius: 5px;
+    background-color: #4ca1f5;
+    text-transform: none;
+    font-size: 16px;
+    border: none;
+    transition: 0.5s all ease;
+    margin-top: 30px;
+}
+
+.login-btn:hover {
+    background-color: #3875a7;
+}
+.social-login-btn {
+    border: 1px solid #3d3d3d;
+    color: #fff;
+    width: 100% !important;
+    display: block;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    border-radius: 5px;
+    background-color: #19191c;
+}
+
+.form-input {
+    height: 50px !important;
+}
+
+input {
+    border-radius: 5px !important;
+    border: 1px solid #ccc !important;
+    color: #fff !important;
+    caret-color: #fff !important;
+    margin: 0 !important;
+}
+
+input:focus {
+    border: 1px solid #4ca1f5 !important;
+}
+
+.social-login-icon {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+}
+
+.social-login-container {
+    position: relative;
+}
+
+.seperator {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    text-transform: uppercase;
+    border: none;
+    font-size: 12px;
+    font-weight: 500;
+    margin: 0;
+    height: 80px;
+    align-items: center;
+}
+
+.seperator:before, .seperator:after {
+    content: "";
+    border-bottom: 1px solid #c2c8d0;
+    flex: 1 0 auto;
+    height: 0.5em;
+    margin: 0;
+}
+
+.seperator span {
+    text-align: center;
+    flex: 0.2 0 auto;
+    margin: 0;
+    color: #ccc;
+    margin-top: 5px
+}
+
+.input-wrapper {
+    position: relative;
+    margin-top: 15px;
+}
+
+.input-wrapper span {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 10px;
+    transition: 0.3s;
+    pointer-events: none;
+    color: gray;
+}
+
+input + span {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 10px;
+    transition: 0.3s;
+    pointer-events: none;
+    color: gray;
+}
+
+input:focus + span {
+    top: -2px;
+    background-color: rgb(29, 26, 37);
+    padding: 0 5px;
+    color: #4ca1f5;
+    font-size: 14px;
+}
+input:not(:placeholder-shown) + span {
+    top: -2px;
+    background-color: rgb(29, 26, 37);
+    padding: 0 5px;
+    font-size: 14px;
+    /* color: #4ca1f5;  */
+}
+
+.error-message span {
+    color: #dd3737;
+}
+
+body {
+    overflow-y: scroll;
+}
+
+/* This is the entire scrollbar */
+::-webkit-scrollbar {
+    width: 8px; /* Adjust width of the scrollbar here */
+}
+
+/* This is the track (background) of the scrollbar */
+::-webkit-scrollbar-track {
+    background: rgb(29, 26, 37); /* Color of the track */
+    border-radius: 10px; /* Roundness of the track */
+}
+
+/* This is the handle (or thumb) */
+::-webkit-scrollbar-thumb {
+    background: #555; /* Color of the handle */
+    border-radius: 10px; /* Roundness of the handle */
+}
+
+/* When hovering over the handle */
+::-webkit-scrollbar-thumb:hover {
+    background: #3e3e3e; /* Color of the handle when hovered */
+}
+
+body {
+    scrollbar-width: thin; /* or "auto" or "none" */
+    scrollbar-color: #555 rgb(29, 26, 37); /* thumb and track color */
+}
+
+
+.site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px;
+    background-color: rgb(19 18 24);
+    color: #fff;
+    padding-bottom: 60px;
+    justify-content: center;
+}
+
+.footer-section {
+    flex: 1 1 200px; /* Flex grow, shrink, and basis */
+    margin-right: 20px;
+    margin-bottom: 20px;
+    max-width: 300px;
+}
+
+.footer-section h3 {
+    border-bottom: 2px solid #666;
+    padding-bottom: 10px;
+    color: #fff;
+    margin-bottom: 15px;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 10px;
+}
+
+.footer-section ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.social-links a {
+    font-size: 24px;
+    margin-right: 10px;
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Assuming you are using Font Awesome for the social icons */
+.fa:hover {
+    opacity: 0.7;
+}
+
+input {
+    color: #fff !important;
+    caret-color: #fff !important;
+}
+
+.input-wrapper.subscribe-email span {
+    background-color: rgb(19 18 24) !important;
+}
+
+
+@media (max-width: 1199px) {
+    .account-info {
+        flex-direction: column !important;
+    }
+
+    .info-name {
+        margin-bottom: 10px;
+    }
+
+    .account-container {
+        max-width: 90% !important;
+    }
+}

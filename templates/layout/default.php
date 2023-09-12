@@ -1,7 +1,4 @@
-<?php
-// dd($user);
-$controllerName = $this->request->getParam('controller');
-?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,11 +17,7 @@ $controllerName = $this->request->getParam('controller');
 
     <link href="https://fonts.googleapis.com/css?family=Raleway:400,700" rel="stylesheet">
 
-    <?= $this->Html->css(['normalize.min', 'milligram.min', 'cake']) ?>
-
-    <?= $this->fetch('meta') ?>
-    <?= $this->fetch('css') ?>
-    <?= $this->fetch('script') ?>
+    <?= $this->Html->css(['normalize.min', 'milligram.min', 'cake', 'main']) ?>
     <?= $this->Html->script('/js/jquery/jquery.js'); ?>
     <?= $this->Html->meta('csrfToken', $this->request->getAttribute('csrfToken')); ?>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
@@ -107,14 +100,11 @@ $controllerName = $this->request->getParam('controller');
         }
 
         .main {
-            /* padding-top: 100px; */
+            min-height: calc(100vh - 80px);
         }
 
         .container {
             max-width: 162rem;
-        }
-        footer {
-            height: 200px;
         }
 
         .account-actions-container {
@@ -169,7 +159,7 @@ $controllerName = $this->request->getParam('controller');
             -khtml-user-select: none; /* Konqueror HTML */
             -moz-user-select: none; /* Old versions of Firefox */
             -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none;
+            /* user-select: none; */
         }
 
         .page-title {
@@ -178,55 +168,48 @@ $controllerName = $this->request->getParam('controller');
             margin-bottom: 40px;
             font-family: 'Rubik';
         }
+
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+            transition-delay: 999999s; /* This will ensure the transition happens after user completes their action */
+            transition: background-color 9999s ease-out, color 9999s ease-out;
+        }
+
+        /* For Mozilla Firefox */
+        input:-moz-autofill,
+        input:-moz-autofill:hover, 
+        input:-moz-autofill:focus {
+            animation-delay: 999999s; /* Similar to the transition-delay trick for Chrome */
+            animation: none;
+        }
     </style>
 </head>
 <body>
     <script>
         const csrfToken = document.querySelector('meta[name="csrfToken"]').getAttribute('content');
     </script>
-    <nav class="top-nav">
-        <a href="/" id="logo-container">
-            <img id="logo" src="/img/UniHub-logo.jpg">
-        </a>
-        <div class="navigation-items">
-            <a class="nav-item <?= $controllerName == 'Pages' ? 'selected' : '' ?>" href="/">
-                Etusivu
-            </a>
-            <div class="nav-seperator"></div>
-            <a class="nav-item <?= $controllerName == 'Tickets' ? 'selected' : '' ?>" href="/tickets">
-                Liput
-            </a>
-            <!-- <div class="nav-seperator"></div>
-            <div class="nav-item">
-                Keskustelut
-            </div> -->
-        </div>
-        <?php if ($user): ?>
-            <div id="profile-button" href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'logout']);?>">
-                <span class="material-symbols-rounded" style="font-size: 28px;">
-                    person
-                </span>
-
-                <ul class="account-actions-container">
-                    <li class="account-action-item" id="profile-action-btn">Tili</li>
-                    <li class="account-action-item" id="tickets-action-btn">Omat liput</li>
-                    <li class="account-action-item" id="tickets-action-btn">Historia</li>
-                    <li class="account-action-item" id="logout-action-btn">Kirjaudu ulos</li>
-                </ul>
-            </div>
-        <?php else: ?>
-            <div id="login-btn" href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login']);?>">Kirjaudu sisään</div>
-        <?php endif; ?>
-
-    </nav>
+    <?php
+        if (isset($dontShowNavigation) && $dontShowNavigation) {
+        } else {
+            echo $this->element('navigation');
+        }
+    ?>
     <main class="main">
         <div class="container">
             <?= $this->Flash->render() ?>
-            <?= $this->fetch('content') ?>
+            <?php
+                echo $this->fetch('content');
+            ?>
         </div>
     </main>
-    <footer>
-    </footer>
+    <?php
+        if (isset($dontShowNavigation) && $dontShowNavigation) {
+        } else {
+            echo $this->element('footer');
+        }
+    ?>
 
     <script>
 

@@ -97,6 +97,7 @@
         position: relative;
         width: 330px;
         border-radius: 10px;
+        min-height: 410px;
     }
 
     .restaurant-like-btn {

@@ -45,6 +45,10 @@ class UsersTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+
+        $this->hasMany('SocialProfiles', [
+            'foreignKey' => 'user_id',
+        ]);
     }
 
     /**
@@ -55,10 +59,10 @@ class UsersTable extends Table
      */
     public function validationDefault(Validator $validator): Validator
     {
-        // $validator
-        //     ->scalar('username')
-        //     ->maxLength('username', 255)
-        //     ->allowEmptyString('username');
+        $validator
+            ->scalar('username')
+            ->maxLength('username', 255)
+            ->allowEmptyString('username');
 
         $validator
             ->email('email')
@@ -67,45 +71,50 @@ class UsersTable extends Table
             ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator
+            ->scalar('kide_email')
+            ->maxLength('kide_email', 255)
+            ->allowEmptyString('kide_email');
+
+        $validator
             ->scalar('password')
             ->maxLength('password', 255)
             ->allowEmptyString('password');
 
-        // $validator
-        //     ->scalar('first_name')
-        //     ->maxLength('first_name', 255)
-        //     ->allowEmptyString('first_name');
+        $validator
+            ->scalar('first_name')
+            ->maxLength('first_name', 255)
+            ->allowEmptyString('first_name');
 
-        // $validator
-        //     ->scalar('last_name')
-        //     ->maxLength('last_name', 255)
-        //     ->allowEmptyString('last_name');
+        $validator
+            ->scalar('last_name')
+            ->maxLength('last_name', 255)
+            ->allowEmptyString('last_name');
 
-        // $validator
-        //     ->scalar('provider')
-        //     ->maxLength('provider', 50)
-        //     ->allowEmptyString('provider');
+        $validator
+            ->scalar('provider')
+            ->maxLength('provider', 50)
+            ->allowEmptyString('provider');
 
-        // $validator
-        //     ->scalar('identifier')
-        //     ->maxLength('identifier', 255)
-        //     ->allowEmptyString('identifier');
+        $validator
+            ->scalar('identifier')
+            ->maxLength('identifier', 255)
+            ->allowEmptyString('identifier');
 
-        // $validator
-        //     ->scalar('access_token')
-        //     ->allowEmptyString('access_token');
+        $validator
+            ->scalar('access_token')
+            ->allowEmptyString('access_token');
 
-        // $validator
-        //     ->scalar('refresh_token')
-        //     ->allowEmptyString('refresh_token');
+        $validator
+            ->scalar('refresh_token')
+            ->allowEmptyString('refresh_token');
 
-        // $validator
-        //     ->boolean('is_active')
-        //     ->allowEmptyString('is_active');
+        $validator
+            ->boolean('is_active')
+            ->allowEmptyString('is_active');
 
-        // $validator
-        //     ->scalar('role')
-        //     ->allowEmptyString('role');
+        $validator
+            ->scalar('role')
+            ->allowEmptyString('role');
 
         return $validator;
     }
@@ -119,7 +128,7 @@ class UsersTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        // $rules->add($rules->isUnique(['username']), ['errorField' => 'username']);
+        $rules->add($rules->isUnique(['username']), ['errorField' => 'username']);
         $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
 
         return $rules;
