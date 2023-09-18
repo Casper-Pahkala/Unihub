@@ -102,8 +102,8 @@
 
     .restaurant-like-btn {
         position: absolute;
-        right: -5px;
-        bottom: -5px;
+        right: 10px;
+        bottom: 10px;
         width: 44px;
         height: 44px;
         border-radius: 100px;
@@ -135,6 +135,7 @@
         width: 100%;
         height: 150px;
         background-color: #fff;
+        cursor: pointer;
     }
 
     .menu-item:not(:last-child) {
@@ -181,7 +182,7 @@
     <?php foreach($menus as $menu): ?>
         <div class="restaurant-container">
             <div class="restaurant" href="<?= $menu['link'] ?>" target="_blank">
-                <img class="restaurant-img" src="<?= $menu['image'] ?>" alt="<?= $menu['name'] ?> image">
+                <img class="restaurant-img" href="<?= $menu['link'] ?>" src="<?= $menu['image'] ?>" alt="<?= $menu['name'] ?> image">
                 <div class="restaurant-menu">
                     <?php foreach($menu['menu'] as $menuItem): ?>
                         <div class="menu-item"><?= $menuItem ?></div>
@@ -265,4 +266,11 @@
         return 'id_' + Math.random().toString(36).substr(2, 9);
     }
 
+    $('.restaurant-img').click(function () {
+        window.open($(this).attr('href'), '_blank');
+    })
+    console.log(window.webdriver)
+    if (window.webdriver) {
+        // Browser is controlled by Selenium
+    }
 </script>

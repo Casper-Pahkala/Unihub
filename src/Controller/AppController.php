@@ -148,7 +148,7 @@ class AppController extends Controller
         if ($cachedMenu) {
             if ($cachedMenu != 'closed') {
                 $menus[] = [
-                    'id' => 4,
+                    'id' => 5,
                     'name' => 'Bacchus',
                     'menu' => $cachedMenu,
                     'image' => '/img/bacchus.jpg',
@@ -160,11 +160,38 @@ class AppController extends Controller
             if ($bacchusMenu) {
                 Cache::write('bacchus-' . FrozenTime::now()->format('Y-m-d'), $bacchusMenu, 'menus');
                 $menus[] = [
-                    'id' => 4,
+                    'id' => 5,
                     'name' => 'Bacchus',
                     'menu' => $bacchusMenu,
                     'image' => '/img/bacchus.jpg',
                     'link' => 'https://bacchus.fi/lounas-brunssi/'
+                ];
+            } else {
+                Cache::write('bacchus-' . FrozenTime::now()->format('Y-m-d'), 'closed', 'menus');
+            }
+        }
+
+        $cachedMenu = Cache::read('w33-' . FrozenTime::now()->format('Y-m-d'), 'menus');
+        if ($cachedMenu) {
+            if ($cachedMenu != 'closed') {
+                $menus[] = [
+                    'id' => 4,
+                    'name' => 'W33',
+                    'menu' => $cachedMenu,
+                    'image' => '/img/w33.png',
+                    'link' => 'https://www.restaurangw33.com/lunch'
+                ];
+            }
+        } else {
+            $w33Menu = $this->getW33Menu();
+            if ($w33Menu) {
+                Cache::write('w33-' . FrozenTime::now()->format('Y-m-d'), $w33Menu, 'menus');
+                $menus[] = [
+                    'id' => 4,
+                    'name' => 'W33',
+                    'menu' => $w33Menu,
+                    'image' => '/img/w33.png',
+                    'link' => 'https://www.restaurangw33.com/lunch'
                 ];
             } else {
                 Cache::write('bacchus-' . FrozenTime::now()->format('Y-m-d'), 'closed', 'menus');
@@ -194,12 +221,16 @@ class AppController extends Controller
             '1' => 0,
             '2' => 0,
             '3' => 0,
-            '4' => 0
+            '4' => 0,
+            '5' => 0
         ];
         foreach ($restaurantCommends as $commend) {
             $commends[$commend['restaurant_id']] += 1;
         }
         arsort($commends);
+        usort($menus, function($a, $b) {
+            return $a['id'] <=> $b['id'];
+        });
         usort($menus, function($a, $b) use ($commends) {
             return $commends[$b['id']] <=> $commends[$a['id']];
         });
@@ -387,6 +418,33 @@ class AppController extends Controller
                     return $menus;
                 }
             }
+        }
+        return false;
+    }
+
+    private function getW33Menu() {
+        $http = new Client();
+        $response = $http->get('https://www.restaurangw33.com/lunch');
+        if ($response->isOk()) {
+            $htmlString = $response->getStringBody();
+            $doc = new \DOMDocument();
+            @$doc->loadHTML($htmlString);
+            $xpath = new \DOMXPath($doc);
+            $menuMeshIds = [
+                'comp-l7a9plg5inlineContent-gridContainer',
+                'comp-l7a9so0rinlineContent-gridContainer',
+                'comp-l7a9v32o1inlineContent-gridContainer',
+                'comp-llwh166pinlineContent-gridContainer',
+                'comp-l7a9z9bsinlineContent-gridContainer'
+            ];
+            $menuBody = $xpath->query('//div[@data-mesh-id="' . $menuMeshIds[Time::now()->setTimezone('Europe/Helsinki')->format('N') - 1] . '"]');
+            $menuElements = $xpath->query('div[@data-testid="richTextElement"]', $menuBody[0]);
+
+            $menuItems = [];
+            foreach ($menuElements as $key => $menuItem) {
+                $menuItems[] = $menuItem->nodeValue . ' 2,95€';
+            }
+            return $menuItems;
         }
         return false;
     }

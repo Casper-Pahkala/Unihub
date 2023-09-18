@@ -172,13 +172,28 @@ body {
     color: #fff;
     padding-bottom: 60px;
     justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding-top: 60px;
+}
+.footer-section-links {
+    display: flex;
+    gap: 20px;
+}
+
+
+.footer-link {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 550;
 }
 
 .footer-section {
-    flex: 1 1 200px; /* Flex grow, shrink, and basis */
     margin-right: 20px;
     margin-bottom: 20px;
-    max-width: 300px;
+    width: 90%;
+    max-width: 1200px;
 }
 
 .footer-section h3 {
@@ -223,6 +238,135 @@ input {
     background-color: rgb(19 18 24) !important;
 }
 
+.ticket {
+    width: 380px;
+    height: 470px;
+    border-radius: 12px;
+    background-color: rgb(70, 64, 84);
+    overflow: hidden;
+    color: #fff;
+    font-family: 'Rubik';
+    position: relative;
+}
+
+.ticket-image {
+    transition: transform 0.3s ease;
+    object-fit: cover;
+}
+
+
+.ticket-info-container {
+    padding: 10px 20px 20px;
+}
+
+.ticket-event-name {
+    color: #fff;
+    font-weight: 700;
+    font-size: 24px;
+}
+
+.ticket-info {
+    margin-top: 7px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#tickets-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap ;
+}
+
+.ticket-image-container {
+    height: 205px;
+    overflow: hidden;
+}
+.rounded-button {
+    height: 45px;
+    border-radius: 10px;
+    background: linear-gradient(to right, rgb(74, 105, 205), rgb(68 71 179));
+    border: none;
+    text-transform: none;
+    color: #fff;
+    line-height: 45px;
+    padding: 0 20px;
+    font-family: 'Rubik';
+    box-shadow: 1px 1px 8px 3px #ffffff17;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.rounded-button:hover {
+    filter: brightness(0.9);
+}
+
+.actions {
+    display: flex;
+    justify-content: end;
+    width: 90%;
+    padding: 40px 0;
+}
+
+.actions-container {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    display: flex;
+    gap: 20px;
+    left: 10px;
+    padding: 10px 12px;
+    justify-content: space-between;
+}
+
+.add-to-cart-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 100px;
+    background: linear-gradient(to bottom right, rgb(74, 105, 205) 0%, rgb(74, 105, 205) 20%, rgb(127, 80, 234) 100%);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px;
+    transform: scale(1);
+    transition: all 0.2s ease;
+    outline: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.add-to-cart-btn:hover, .kide-btn:hover {
+    scale: 1.04;
+}
+
+.kide-btn {
+    height: 44px;
+    width: 100px;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.over-og-price {
+    color: #d12727;
+}
+
+.under-og-price {
+    color: #4fe94f;
+}
+
+.free-price-text {
+    color: #4fe94f;
+}
+
 
 @media (max-width: 1199px) {
     .account-info {
@@ -236,4 +380,8 @@ input {
     .account-container {
         max-width: 90% !important;
     }
+}
+
+button:active, button:focus {
+    border: 1px dashed #ccc !important;
 }

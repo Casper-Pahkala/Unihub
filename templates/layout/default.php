@@ -40,8 +40,16 @@
 
         .top-nav {
             height: 80px;
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .main-nav-items {
+            height: 80px;
             padding: 10px;
             position: relative;
+            width: 100%;
+            justify-content: space-between;
         }
 
         .navigation-items {
@@ -52,16 +60,19 @@
         }
 
         #profile-button {
-            width: 50px;
+            width: 200px;
             height: 50px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            border-radius: 100px;
+            border-radius: 8px;
             /* background: rgb(111, 115, 165); */
             background-color: rgb(29, 26, 37);
             cursor: pointer;
             position: relative;
+            gap: 10px;
+            color: #fff;
+            border: 1px solid #c1c3cb;
+            padding: 0 10px;
         }
 
         .nav-item {
@@ -95,7 +106,7 @@
             color: white;
         }
 
-        #logo-container {
+        .logo-container {
             height: 100%;
         }
 
@@ -113,7 +124,7 @@
             background-color: rgb(65 60 77);
             border-radius: 6px;
             position: absolute;
-            top: 5px;
+            top: 50px;
             right: 0;
             z-index: 100;
             overflow: hidden;
@@ -130,6 +141,7 @@
             font-family: 'Roboto';
             transition: all 0.3s ease;
             cursor: pointer;
+            display: flex;
         }
 
         .account-action-item:hover {
@@ -138,6 +150,43 @@
 
         .account-actions-container.open {
             transform: scaleY(1);
+        }
+
+        .profile-dropdown-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 10px;
+            color: #999999;
+        }
+
+        .account-action-icon {
+            width: 40px;
+        }
+
+        .account-action-seperator {
+            height: 10px;
+            width: 100%;
+            position: relative;
+            margin: 0;
+            cursor: default;
+        }
+        .account-action-seperator:before {
+            content: "";
+            border-bottom: 1px solid #999999;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            right: 0;
+        }
+
+        #nav-menu-btn {
+            display: none;
+            width: 40px;
+            height: 40px;
+            justify-content: center;
+            align-items: center;
         }
 
         #login-btn {
@@ -184,6 +233,80 @@
             animation-delay: 999999s; /* Similar to the transition-delay trick for Chrome */
             animation: none;
         }
+
+        .main-nav-items {
+            display: flex;
+            align-items: center;
+        }
+
+        #logo-container-mini {
+            display: none;
+        }
+
+        .login-nav-btn {
+            height: 30px;
+        }
+
+        @media (max-width: 1199px) {
+            #logo-container-mini {
+                display: block;
+            }
+            #nav-menu-btn {
+                display: flex;
+            }
+            .main-nav-items {
+                position: fixed;
+                right: -100%;
+                top: 0;
+                bottom: 0;
+                flex-direction: column;
+                display: none;
+                height: 100vh;
+                width: 100vw;
+                z-index: 100;
+                transition: right 0.3s ease;
+            }
+            .navigation-items {
+                width: 75vw;
+                max-width: 400px;
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgb(41 39 48);
+                flex-direction: column;
+                padding: 20px;
+                gap: 20px;
+                padding-top: 50px;
+                justify-content: flex-start;
+            }
+            .nav-seperator {
+                display: none;
+            }
+            #logo-container {
+                display: none;
+            }
+            .profile-btn {
+                position: absolute !important;
+                bottom: 20px !important;
+                width: 80% !important;
+            }
+            .account-actions-container {
+                top: auto;
+                bottom: 50px;
+                transform-origin: bottom;
+                width: 100%;
+            }
+            #login-btn {
+                height: 50px;
+                border-radius: 8px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 17px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -213,12 +336,21 @@
 
     <script>
 
-
-        $('#profile-button').click(function() {
-            showProfileActions();
+        var profileActionsOpen = false;
+        var navMenuOpen = false;
+        $('#profile-button').click(function(e) {
+            if (e.target.classList.contains('account-action-seperator')) {
+                return;
+            }
+            if (profileActionsOpen) {
+                closeProfileActions();
+            } else {
+                showProfileActions();
+            }
         });
 
         function showProfileActions() {
+            profileActionsOpen = true;
             $('.account-actions-container').show();
             setTimeout(() => {
                 $('.account-actions-container').addClass('open');
@@ -226,6 +358,7 @@
         }
 
         function closeProfileActions() {
+            profileActionsOpen = false;
             $('.account-actions-container').removeClass('open');
             setTimeout(() => {
                 $('.account-actions-container').hide();
@@ -253,6 +386,52 @@
         $('#logout-action-btn').click(function() {
             window.location.href = '<?= $this->Url->build(['controller' => 'Users', 'action' => 'logout']);?>';
         });
+
+        $('#nav-menu-btn').click(function() {
+            if (width < 1199) {
+                $('.main-nav-items').show();
+                setTimeout(() => {
+                    $('.main-nav-items').css('right', '0');
+                }, 10);
+            }
+        })
+
+        function closeNavMenu() {
+            $('.main-nav-items').css('right', '-100%');
+            setTimeout(() => {
+                $('.main-nav-items').hide();
+            }, 300);
+        }
+        var width = $(window).width();
+        if (width < 1199) {
+            $('.navigation-items').append($('.profile-btn'));
+            let diff =  $('.main-nav-items').outerHeight() - window.innerHeight;
+            diff += 10;
+            $('.profile-btn').css('bottom', diff + 'px');
+        }
+        $(window).resize(function() {
+            width = $(window).width();
+            if (width < 1199) {
+                $('.navigation-items').append($('.profile-btn'));
+
+                let diff =  $('.main-nav-items').outerHeight() - window.innerHeight;
+                diff += 10;
+                $('.profile-btn').css('bottom', diff + 'px');
+            } else {
+                $('.main-nav-items').append($('.profile-btn'));
+                $('.main-nav-items').css({
+                    display: '',
+                    right: ''
+                })
+            }
+        });
+
+        $('.main-nav-items').click(function(event) {
+            if (event.target === this && width < 1199) {
+                closeNavMenu();
+            }
+        });
+
     </script>
 </body>
 </html>
