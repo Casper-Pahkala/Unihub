@@ -9,6 +9,8 @@ use Cake\ORM\Table;
 use Cake\Validation\Validator;
 use \Cake\Datasource\EntityInterface;
 use \Cake\Http\Session;
+use Cake\Event\Event;
+use ArrayObject;
 /**
  * Users Model
  *
@@ -46,8 +48,9 @@ class UsersTable extends Table
 
         $this->addBehavior('Timestamp');
 
-        $this->hasMany('SocialProfiles', [
+        $this->hasOne('SocialProfiles', [
             'foreignKey' => 'user_id',
+            'className' => 'ADmad/SocialAuth.SocialProfiles'
         ]);
     }
 
@@ -169,5 +172,11 @@ class UsersTable extends Table
         }
 
         return $user;
+    }
+
+    public function beforeFind(Event $event, Query $query, ArrayObject $options, bool $primary)
+    {
+        $query->contain(['SocialProfiles']);
+        return $query;
     }
 }

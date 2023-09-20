@@ -106,6 +106,7 @@ return static function (RouteBuilder $routes) {
         $routes->applyMiddleware('apiToken');
         $routes->connect('/:action', ['controller' => 'App'], ['pass' => ['action']]);
         $routes->connect('/get-user/*', ['controller' => 'App', 'action' => 'getUser']);
+        $routes->connect('/update-kide-email', ['controller' => 'Users', 'action' => 'updateKideEmail']);
         $routes->fallbacks();
     });
 };

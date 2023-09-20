@@ -90,6 +90,7 @@
         background-color: inherit;
         border: none;
         border: 1px solid transparent;
+        color: #b7b7b7;
     }
 
     .cancel-btn:hover {
@@ -244,6 +245,22 @@
                 return;
                 }
                 this.editingKideEmail = false;
+
+                const payload = {
+                    kide_email: this.kideEmail,
+                    token: '<?= $token ?>'
+                };
+
+                fetch("/api/update-kide-email.json", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }, 
+                    body: JSON.stringify(payload)
+                }).then(res => {
+                    console.log("Request complete! response:", res);
+                });
             },
             cancelEditKideEmail () {
                 this.editingKideEmail = false;

@@ -24,6 +24,8 @@ use Cake\Cache\Cache;
 use League\OAuth2\Client\Provider\Google;
 use Cake\Core\Configure;
 use Firebase\JWT\JWT;
+use Cake\ORM\Entity;
+
 use Cake\Http\Cookie\Cookie;
 /**
  * Application Controller
@@ -240,6 +242,13 @@ class AppController extends Controller
             $topRestaurant = null;
         }
         $user = $this->Authentication->getIdentity();
+        if ($user) {
+            $this->loadModel('Users');
+            $dbUser = $this->Users->get($user->id);
+            // $mergedUser = new Entity(array_merge(get_object_vars($user), $dbUser));
+            $this->Authentication->setIdentity($dbUser);
+            $user = $this->Authentication->getIdentity();
+        }
         $token = $this->request->getCookie('jwt');
         if (!$token && $user) {
             $token = $this->addTokenCookie($user);

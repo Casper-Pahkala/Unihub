@@ -121,7 +121,7 @@ class UsersController extends AppController
             $user->username = $username;
             $users = $this->Users->find()
                 ->where([
-                    'username' => $username
+                    'Users.username' => $username
                 ])
                 ->enableHydration(false)
                 ->toArray();
