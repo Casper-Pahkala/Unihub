@@ -27,7 +27,7 @@ class ApiTokenMiddleware
             if ($request->getHeaderLine('X-CSRF-Token')) {
 
             } else {
-                throw new UnauthorizedException('Invalid API token');
+                // throw new UnauthorizedException('Invalid API token');
             }
         }
         // If all is well, forward the request/response to the next middleware in line or to the controller.

@@ -102,8 +102,8 @@
 
     .restaurant-like-btn {
         position: absolute;
-        right: 10px;
-        bottom: 10px;
+        right: -5px;
+        bottom: -5px;
         width: 44px;
         height: 44px;
         border-radius: 100px;

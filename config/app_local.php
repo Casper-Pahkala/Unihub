@@ -6,6 +6,10 @@
  * into source code version control.
  */
 return [
+
+    'Settings' => [
+        'TradeTimeOut' => 300
+    ],
     /*
      * Debug Level:
      *

@@ -107,6 +107,8 @@ return static function (RouteBuilder $routes) {
         $routes->connect('/:action', ['controller' => 'App'], ['pass' => ['action']]);
         $routes->connect('/get-user/*', ['controller' => 'App', 'action' => 'getUser']);
         $routes->connect('/update-kide-email', ['controller' => 'Users', 'action' => 'updateKideEmail']);
+        $routes->connect('/add-bot', ['controller' => 'KideBots', 'action' => 'addBot']);
+        $routes->connect('/get-bots', ['controller' => 'KideBots', 'action' => 'getBots']);
         $routes->fallbacks();
     });
 };
